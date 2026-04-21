@@ -82,7 +82,6 @@ export default async function TrainingPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-px bg-neutral-200 border border-neutral-200 rounded-xl overflow-hidden">
                         {(techniques ?? []).map((t) => (
                             <div key={t.id} className="bg-white p-6 hover:bg-neutral-900 group transition-colors duration-200">
-                                <div className="w-1 h-6 bg-[#566246] mb-4 group-hover:bg-white transition-colors" />
                                 <h3 className="font-bold text-neutral-900 group-hover:text-white mb-1 transition-colors">{t.name}</h3>
                                 <p className="text-sm text-neutral-500 group-hover:text-white/60 transition-colors">{t.desc}</p>
                             </div>
