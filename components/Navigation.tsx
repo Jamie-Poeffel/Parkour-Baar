@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Menu, X, LayoutDashboard, Users } from "lucide-react";
 import { useAuth, useUser, SignOutButton } from "@clerk/nextjs";
+import { hasPermission } from "@/lib/permissions";
 
 export function Navigation() {
   const pathname = usePathname();
@@ -22,10 +23,9 @@ export function Navigation() {
     sessionClaims?.publicMetadata as { role?: string } | undefined
   )?.role;
   const roleFromUser = user?.publicMetadata?.role as string | undefined;
+  const role = roleFromClaims ?? roleFromUser;
   const isAdmin =
-    isLoaded &&
-    isSignedIn &&
-    (roleFromClaims === "admin" || roleFromUser === "admin");
+    isLoaded && isSignedIn && hasPermission(role, "dashboard:access");
 
   useEffect(() => {
     if (!isHero) return;

@@ -4,21 +4,19 @@ import { SignOutButton } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { getSiteData } from "@/lib/site-data";
-import {
-  LogOut,
-  MapPin,
-  Clock,
-  Mail,
-  User,
-  LayoutDashboard,
-} from "lucide-react";
+import { LogOut, MapPin, Clock, Mail, User } from "lucide-react";
+import { Navigation } from "@/components/Navigation";
+import { hasPermission, getRole } from "@/lib/permissions";
 
 export default async function MitgliederPage() {
   const { userId } = await auth();
   if (!userId) redirect("/login");
 
   const user = await currentUser();
-  const isAdmin = user?.publicMetadata?.role === "admin";
+  const role = getRole(user?.publicMetadata as Record<string, unknown>);
+
+  if (!hasPermission(role, "mitglieder:access")) redirect("/login");
+
   const { training, contact } = await getSiteData();
 
   const initials =
@@ -31,47 +29,15 @@ export default async function MitgliederPage() {
     user?.emailAddresses[0]?.emailAddress ||
     "Mitglied";
 
+  const isAdmin = role === "admin";
+
   return (
     <div className="min-h-screen bg-neutral-50">
-      {/* Header */}
-      <header className="bg-white border-b border-neutral-200">
-        <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2.5">
-              <Image
-                src="/dark_icon.png"
-                alt="Parkour Baar"
-                width={24}
-                height={24}
-                className="object-contain"
-              />
-              <span className="font-bold text-neutral-900 tracking-tight">
-                Parkour Baar
-              </span>
-            </Link>
-            {isAdmin && (
-              <>
-                <span className="text-neutral-300">·</span>
-                <Link
-                  href="/dashboard"
-                  className="flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900 transition-colors"
-                >
-                  <LayoutDashboard className="w-4 h-4" /> Dashboard
-                </Link>
-              </>
-            )}
-          </div>
-          <SignOutButton redirectUrl="/">
-            <button className="flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900 transition-colors">
-              <LogOut className="w-4 h-4" /> Abmelden
-            </button>
-          </SignOutButton>
-        </div>
-      </header>
+      <Navigation />
 
-      <main className="max-w-4xl mx-auto px-6 py-10 space-y-6">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-10 space-y-6">
         {/* Profile card */}
-        <div className="bg-white rounded-xl border border-neutral-200 p-8 flex items-center gap-6">
+        <div className="bg-white rounded-xl border border-neutral-200 p-6 sm:p-8 flex flex-col sm:flex-row items-center sm:items-start gap-5">
           {user?.imageUrl ? (
             <Image
               src={user.imageUrl}
@@ -85,7 +51,7 @@ export default async function MitgliederPage() {
               <span className="text-white font-bold text-xl">{initials}</span>
             </div>
           )}
-          <div>
+          <div className="text-center sm:text-left">
             <h1 className="text-xl font-black text-neutral-900 tracking-tight">
               {fullName}
             </h1>
@@ -117,8 +83,8 @@ export default async function MitgliederPage() {
                   key={s.id}
                   className="flex items-center justify-between text-sm py-2 border-b border-neutral-50 last:border-0"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="font-semibold text-neutral-900 w-24">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <span className="font-semibold text-neutral-900 w-20 sm:w-24">
                       {s.day}
                     </span>
                     <span className="text-neutral-500">{s.time}</span>

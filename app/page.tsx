@@ -174,7 +174,7 @@ export default async function Home() {
               </h2>
               <p className="mt-4 text-white/60 max-w-md">
                 Kostenlose Probestunde. Keine Vorkenntnisse erforderlich.
-                Einfach vorbeikommen.
+                Schreib uns kurz eine E-Mail und wir bestätigen den Termin.
               </p>
             </div>
             <Link

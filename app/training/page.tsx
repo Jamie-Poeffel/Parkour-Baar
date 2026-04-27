@@ -84,10 +84,15 @@ export default async function TrainingPage() {
               </div>
             ))}
           </div>
-          <div className="flex items-center gap-2 text-sm text-neutral-500">
+          <a
+            href="https://maps.google.com/?q=Sternmatt+2,+6340+Baar"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900 transition-colors w-fit"
+          >
             <MapPin className="w-4 h-4 shrink-0 text-neutral-400" />
             {training.location}
-          </div>
+          </a>
         </div>
       </section>
 
@@ -127,7 +132,8 @@ export default async function TrainingPage() {
                 Kostenlose Probestunde
               </h2>
               <p className="mt-3 text-white/60">
-                Keine Anmeldung, keine Vorkenntnisse. Einfach vorbeikommen.
+                Keine Vorkenntnisse erforderlich. Schreib uns kurz eine E-Mail
+                und wir bestätigen den Termin.
               </p>
             </div>
             <Link

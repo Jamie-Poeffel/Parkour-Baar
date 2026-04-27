@@ -1,5 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { hasPermission } from "@/lib/permissions";
 
 const isAdminRoute = createRouteMatcher(["/dashboard(.*)"]);
 const isProtected = createRouteMatcher([
@@ -12,18 +13,20 @@ const isProtected = createRouteMatcher([
 export default clerkMiddleware(async (auth, req) => {
   if (!isProtected(req)) return;
 
-  const { userId, sessionClaims } = await auth.protect();
+  const { sessionClaims } = await auth.protect();
   const role = (sessionClaims?.publicMetadata as { role?: string } | undefined)
     ?.role;
 
   // Non-admins trying to access dashboard → send to member area
-  if (isAdminRoute(req) && role !== "admin") {
+  if (isAdminRoute(req) && !hasPermission(role, "dashboard:access")) {
     return NextResponse.redirect(new URL("/mitglieder", req.url));
   }
 
   // Already-authed users hitting /auth-redirect → route by role
   if (req.nextUrl.pathname === "/auth-redirect") {
-    const dest = role === "admin" ? "/dashboard" : "/mitglieder";
+    const dest = hasPermission(role, "dashboard:access")
+      ? "/dashboard"
+      : "/mitglieder";
     return NextResponse.redirect(new URL(dest, req.url));
   }
 });
