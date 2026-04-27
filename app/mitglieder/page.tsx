@@ -1,10 +1,10 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { SignOutButton } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { getSiteData } from "@/lib/site-data";
-import { LogOut, MapPin, Clock, Mail, User } from "lucide-react";
+import { MapPin, Clock, Mail, User } from "lucide-react";
+import { SignOutBtn } from "@/components/SignOutBtn";
 import { Navigation } from "@/components/Navigation";
 import { hasPermission, getRole } from "@/lib/permissions";
 
@@ -44,7 +44,7 @@ export default async function MitgliederPage() {
               alt={fullName}
               width={64}
               height={64}
-              className="rounded-full object-cover shrink-0"
+              className="rounded-full object-cover shrink-0 w-16 h-16"
             />
           ) : (
             <div className="w-16 h-16 rounded-full bg-neutral-900 flex items-center justify-center shrink-0">
@@ -149,11 +149,7 @@ export default async function MitgliederPage() {
             >
               Profil bearbeiten
             </Link>
-            <SignOutButton redirectUrl="/">
-              <button className="flex items-center gap-2 px-4 py-2.5 border border-red-200 text-red-600 rounded-md text-sm font-semibold hover:bg-red-50 transition-colors">
-                <LogOut className="w-4 h-4" /> Abmelden
-              </button>
-            </SignOutButton>
+            <SignOutBtn />
           </div>
         </div>
       </main>

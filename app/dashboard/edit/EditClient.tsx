@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { SignOutButton } from "@clerk/nextjs";
+import { SignOutBtn } from "@/components/SignOutBtn";
 import {
   updateAbout,
   updateStats,
@@ -18,7 +18,6 @@ import {
 } from "@/app/actions";
 import type { SiteData, Session, Social, Technique } from "@/lib/site-data";
 import {
-  LogOut,
   ArrowLeft,
   Plus,
   Trash2,
@@ -818,11 +817,7 @@ export function EditClient({ data }: Props) {
               Website bearbeiten
             </span>
           </div>
-          <SignOutButton redirectUrl="/">
-            <button className="flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900 transition-colors">
-              <LogOut className="w-4 h-4" /> Abmelden
-            </button>
-          </SignOutButton>
+          <SignOutBtn />
         </div>
       </header>
 

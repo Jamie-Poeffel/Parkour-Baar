@@ -5,7 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Menu, X, LayoutDashboard, Users } from "lucide-react";
-import { useAuth, useUser, SignOutButton } from "@clerk/nextjs";
+import { useAuth, useUser, useClerk } from "@clerk/nextjs";
 import { hasPermission } from "@/lib/permissions";
 
 export function Navigation() {
@@ -14,6 +14,7 @@ export function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const { isSignedIn, isLoaded, sessionClaims } = useAuth();
   const { user } = useUser();
+  const { signOut } = useClerk();
 
   const isHero = pathname === "/";
 
@@ -170,11 +171,12 @@ export function Navigation() {
                 >
                   Mein Bereich
                 </Link>
-                <SignOutButton redirectUrl="/">
-                  <button className="w-full py-3 border border-neutral-200 text-neutral-600 font-semibold rounded-md text-center hover:bg-neutral-50 transition-colors">
-                    Abmelden
-                  </button>
-                </SignOutButton>
+                <button
+                  onClick={() => signOut({ redirectUrl: "/" })}
+                  className="w-full py-3 border border-neutral-200 text-neutral-600 font-semibold rounded-md text-center hover:bg-neutral-50 transition-colors"
+                >
+                  Abmelden
+                </button>
               </>
             ) : (
               <Link
