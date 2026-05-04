@@ -81,11 +81,6 @@ export function Navigation() {
           >
             Parkour Baar
           </span>
-          <span
-            className={`text-[10px] font-mono px-1.5 py-0.5 rounded transition-colors ${transparent ? "text-white/50" : "text-neutral-400"}`}
-          >
-            v{process.env.NEXT_PUBLIC_APP_VERSION}
-          </span>
         </Link>
 
         {/* Desktop */}

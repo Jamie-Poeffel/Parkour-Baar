@@ -29,7 +29,14 @@ export default function RootLayout({
   return (
     <ClerkProvider dynamic>
       <html lang="de" className={inter.variable} suppressHydrationWarning>
-        <body className="antialiased">{children}</body>
+        <body className="antialiased">
+          {children}
+          <footer className="text-center py-4">
+            <span className="text-xs font-mono text-neutral-400">
+              v{process.env.NEXT_PUBLIC_APP_VERSION}
+            </span>
+          </footer>
+        </body>
       </html>
     </ClerkProvider>
   );
