@@ -1,6 +1,5 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { Users, Calendar, ExternalLink, Pencil } from "lucide-react";
 import { getSiteData } from "@/lib/site-data";
@@ -107,7 +106,17 @@ export default async function DashboardPage() {
                     </span>
                     <span className="text-neutral-500">{s.time}</span>
                   </div>
-                  <span className="text-xs text-neutral-400">{s.level}</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-neutral-400">{s.level}</span>
+                    {hasPermission(role, "dashboard:access") && (
+                      <Link
+                        href="/dashboard/teilnehmer"
+                        className="text-xs font-medium text-neutral-500 hover:text-neutral-900 underline underline-offset-2 transition-colors"
+                      >
+                        Teilnehmer
+                      </Link>
+                    )}
+                  </div>
                 </div>
               ))}
               {training.sessions.length === 0 && (
