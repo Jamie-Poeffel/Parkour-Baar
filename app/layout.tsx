@@ -12,7 +12,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Parkour Baar",
   description:
-    "Parkour Club in Baar – professionelles Training für alle Levels",
+    "Parkour Club in Baar - professionelles Training für alle Levels",
 };
 
 export const viewport: Viewport = {

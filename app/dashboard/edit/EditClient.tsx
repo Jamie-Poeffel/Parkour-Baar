@@ -23,7 +23,6 @@ import {
   Trash2,
   Save,
   Clock,
-  MapPin,
   Users,
   BarChart2,
   AtSign,
@@ -103,7 +102,6 @@ const inputCls =
   "w-full px-3 py-2.5 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent bg-white";
 const textareaCls = `${inputCls} resize-none`;
 
-// ── SESSIONS SECTION ──────────────────────────────────────────────────────────
 function SessionsSection({
   initial,
   location: initLocation,
@@ -189,6 +187,7 @@ function SessionsSection({
             {editing?.id === s.id ? (
               <SessionForm
                 session={editing}
+                allSessions={sessions}
                 onChange={setEditing}
                 onSave={() => save(editing)}
                 onCancel={() => setEditing(null)}
@@ -196,7 +195,7 @@ function SessionsSection({
               />
             ) : (
               <div className="flex items-center justify-between px-4 py-3">
-                <div className="flex items-center gap-4 text-sm">
+                <div className="flex items-center gap-4 text-sm flex-wrap">
                   <span className="font-semibold text-neutral-900 w-24">
                     {s.day}
                   </span>
@@ -207,6 +206,14 @@ function SessionsSection({
                   <span className="text-neutral-400 text-xs hidden sm:block">
                     {s.note}
                   </span>
+                  {s.linkedTo && (() => {
+                    const linked = sessions.find((x) => x.id === s.linkedTo);
+                    return linked ? (
+                      <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full text-xs">
+                        ⟷ {linked.day} {linked.time}
+                      </span>
+                    ) : null;
+                  })()}
                 </div>
                 <div className="flex items-center gap-1">
                   {savedId === s.id && (
@@ -236,6 +243,7 @@ function SessionsSection({
         <div className="border border-neutral-200 rounded-lg">
           <SessionForm
             session={editing}
+            allSessions={sessions}
             onChange={setEditing}
             onSave={() => save(editing)}
             onCancel={() => setEditing(null)}
@@ -256,17 +264,20 @@ function SessionsSection({
 
 function SessionForm({
   session,
+  allSessions,
   onChange,
   onSave,
   onCancel,
   isPending,
 }: {
   session: Session;
+  allSessions: Session[];
   onChange: (s: Session) => void;
   onSave: () => void;
   onCancel: () => void;
   isPending: boolean;
 }) {
+  const others = allSessions.filter((s) => s.id !== session.id);
   return (
     <div className="p-4 space-y-3">
       <div className="grid grid-cols-2 gap-3">
@@ -304,6 +315,22 @@ function SessionForm({
             value={session.note}
             onChange={(e) => onChange({ ...session, note: e.target.value })}
           />
+        </Field>
+        <Field label="Verknüpft mit">
+          <select
+            className={inputCls}
+            value={session.linkedTo ?? ""}
+            onChange={(e) =>
+              onChange({ ...session, linkedTo: e.target.value || undefined })
+            }
+          >
+            <option value="">– keine –</option>
+            {others.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.day} {s.time} {s.level ? `(${s.level})` : ""}
+              </option>
+            ))}
+          </select>
         </Field>
       </div>
       <div className="flex justify-end gap-2 pt-1">

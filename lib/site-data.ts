@@ -6,6 +6,7 @@ export type Session = {
   time: string;
   level: string;
   note: string;
+  linkedTo?: string;
 };
 
 export type Social = {

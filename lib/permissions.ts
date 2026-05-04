@@ -1,5 +1,10 @@
 export type Role = "admin" | "member";
 
+export enum RoleType {
+  admin = "admin",
+  member = "member"
+}
+
 export type Permission =
   | "dashboard:access"
   | "dashboard:edit"
@@ -22,6 +27,6 @@ export function getRole(
   publicMetadata: Record<string, unknown> | null | undefined
 ): Role {
   const role = publicMetadata?.role;
-  if (role === "admin") return "admin";
-  return "member";
+  if (role === "admin") return RoleType.admin;
+  return RoleType.member;
 }
