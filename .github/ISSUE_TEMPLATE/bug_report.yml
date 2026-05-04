@@ -1,0 +1,82 @@
+name: "Bug report"
+description: "Report a reproducible issue in the mobile application"
+title: "[BUG] "
+labels: ["bug"]
+
+body:
+  - type: dropdown
+    id: platform
+    attributes:
+      label: "Platform"
+      description: "Select the affected platform"
+      options:
+        - iOS
+        - Android
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: "Severity"
+      description: "Indicate the impact of the issue"
+      options:
+        - Low
+        - Medium
+        - High
+        - Critical
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "Description"
+      description: "Provide a clear and concise description of the issue"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: "Steps to Reproduce"
+      description: "List the steps required to reproduce the issue"
+      placeholder: |
+        1. Open the app
+        2. Navigate to ...
+        3. Tap on ...
+        4. Observe the issue
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Expected Behavior"
+      description: "Describe what you expected to happen"
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: "Device"
+      description: "Specify the device model (e.g., iPhone 13, Samsung Galaxy S22)"
+
+  - type: input
+    id: os
+    attributes:
+      label: "Operating System Version"
+      description: "Specify the OS version (e.g., iOS 17, Android 14)"
+
+  - type: input
+    id: app_version
+    attributes:
+      label: "App Version"
+      description: "Specify the app version (e.g., 1.2.3)"
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: "Additional Context"
+      description: "Include logs, screenshots, or any other relevant information"
