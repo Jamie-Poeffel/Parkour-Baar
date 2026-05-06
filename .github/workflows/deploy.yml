@@ -57,7 +57,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout main
           git rebase origin/release
-          git push origin main
+          git push --force-with-lease origin main
 
   deploy:
     runs-on: ubuntu-latest
