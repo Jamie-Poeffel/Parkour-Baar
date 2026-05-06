@@ -74,7 +74,17 @@ export default function PostTrainingPrompt({ sessions, userId }: Props) {
                 aria-label="Schliessen"
                 className="absolute top-5 left-5 flex items-center justify-center w-10 h-10 rounded-full bg-neutral-200 hover:bg-neutral-300 transition-colors text-neutral-700"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                >
                     <line x1="18" y1="6" x2="6" y2="18" />
                     <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
@@ -91,10 +101,13 @@ export default function PostTrainingPrompt({ sessions, userId }: Props) {
                     {subtitle}
                 </p>
                 <h1 className="text-4xl font-black text-neutral-900 tracking-tight leading-tight">
-                    Training<br />{title}
+                    Training
+                    <br />
+                    {title}
                 </h1>
                 <p className="text-neutral-500 text-base max-w-xs leading-relaxed mt-2">
-                    Das Training hat diese Woche stattgefunden. Möchtest du dich für nächste Woche abmelden?
+                    Das Training hat diese Woche stattgefunden. Möchtest du dich
+                    für nächste Woche abmelden?
                 </p>
             </div>
 
@@ -104,6 +117,13 @@ export default function PostTrainingPrompt({ sessions, userId }: Props) {
                     className="w-full py-4 bg-neutral-900 text-white text-base font-bold rounded-xl hover:bg-neutral-700 transition-colors"
                 >
                     Abmelden
+                </button>
+
+                <button
+                    onClick={close}
+                    className="w-full py-4 bg-neutral-900 text-white text-base font-bold rounded-xl hover:bg-neutral-700 transition-colors"
+                >
+                    Schliessen
                 </button>
             </div>
         </div>

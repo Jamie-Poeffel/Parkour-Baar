@@ -30,22 +30,22 @@ export function EditClient({ data }: Props) {
     <div className="min-h-screen bg-neutral-50">
       <header className="bg-white border-b border-neutral-200 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <Image
               src="/dark_icon.png"
               alt="Parkour Baar"
               width={24}
               height={24}
-              className="object-contain"
+              className="object-contain shrink-0"
             />
             <Link
               href="/dashboard"
-              className="flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900 transition-colors"
+              className="flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900 transition-colors shrink-0"
             >
               <ArrowLeft className="w-4 h-4" /> Dashboard
             </Link>
-            <span className="text-neutral-300">/</span>
-            <span className="text-sm font-semibold text-neutral-900">
+            <span className="text-neutral-300 hidden sm:inline">/</span>
+            <span className="text-sm font-semibold text-neutral-900 hidden sm:inline truncate">
               Website bearbeiten
             </span>
           </div>

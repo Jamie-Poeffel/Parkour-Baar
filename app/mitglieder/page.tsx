@@ -117,11 +117,11 @@ export default async function MitgliederPage() {
                 {/* Next training card */}
                 {nextGroup && (
                     <div className="bg-white rounded-xl border border-neutral-200 p-5 flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-4 min-w-0">
                             <div className="w-10 h-10 rounded-lg bg-neutral-100 flex items-center justify-center shrink-0">
                                 <CalendarDays className="w-5 h-5 text-neutral-500" />
                             </div>
-                            <div>
+                            <div className="min-w-0">
                                 <p className="text-xs text-neutral-400 font-medium uppercase tracking-wider mb-0.5">
                                     Nächstes Training
                                 </p>
