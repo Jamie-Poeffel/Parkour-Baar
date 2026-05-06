@@ -41,32 +41,6 @@ body:
     validations:
       required: true
 
-  - type: textarea
-    id: problem
-    attributes:
-      label: "Problem Statement"
-      description: "Explain the problem this feature aims to solve"
-    validations:
-      required: true
-
-  - type: textarea
-    id: solution
-    attributes:
-      label: "Proposed Solution"
-      description: "Describe how this feature could be implemented"
-
-  - type: textarea
-    id: alternatives
-    attributes:
-      label: "Alternatives Considered"
-      description: "List any alternative approaches or workarounds"
-
-  - type: textarea
-    id: impact
-    attributes:
-      label: "User and Business Impact"
-      description: "Explain the expected benefits and who will be affected"
-
   - type: dropdown
     id: priority
     attributes:
