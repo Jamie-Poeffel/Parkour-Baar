@@ -60,6 +60,7 @@ export default function PostTrainingPrompt({ sessions, userId, registeredSession
     const [state, setState] = useState<{ pending: Group[]; current: number } | null>(null);
 
     useEffect(() => {
+        const isDev = process.env.NODE_ENV === "development";
         const groups = buildGroups(sessions);
         const pending = groups.filter((g) => {
             // Training must have already happened this week
@@ -71,6 +72,9 @@ export default function PostTrainingPrompt({ sessions, userId, registeredSession
                 registeredSessionIds.includes(s.id),
             );
             if (!isRegistered) return false;
+
+            // In dev always show (so you can test without clearing localStorage)
+            if (isDev) return true;
 
             // User already dismissed this prompt this week
             return !isDismissed(g, occ);
@@ -101,8 +105,9 @@ export default function PostTrainingPrompt({ sessions, userId, registeredSession
     }
 
     async function abmelden() {
-        const occ = groupOccurrence(group);
-        if (occ) markDismissed(group, occ);
+        // Don't write localStorage here — once the server action runs the user
+        // will no longer be in registeredSessionIds, which suppresses the prompt
+        // on all future renders without relying on a local entry.
         for (const session of group.sessions) {
             await abmeldenAction(session.id, userId);
         }
