@@ -1,5 +1,6 @@
 {
   "github": {
     "enabled": false
-  }
+  },
+  "alias": ["parkourbaar.vercel.app"]
 }
