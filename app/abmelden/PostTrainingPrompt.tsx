@@ -10,6 +10,8 @@ import { abmeldenAction } from "./actions";
 type Props = {
     sessions: Session[];
     userId: string;
+    /** Session IDs the server considers the user registered for (fresh per render). */
+    registeredSessionIds: string[];
 };
 
 function thisWeekOccurrence(dayName: string): Date | null {
@@ -25,7 +27,6 @@ function thisWeekOccurrence(dayName: string): Date | null {
 }
 
 function groupOccurrence(group: Group): Date | null {
-    // earliest session in the group that has already occurred this week
     const occs = group.sessions
         .map((s) => thisWeekOccurrence(s.day))
         .filter(Boolean) as Date[];
@@ -33,25 +34,49 @@ function groupOccurrence(group: Group): Date | null {
     return occs.reduce((min, d) => (d < min ? d : min));
 }
 
-function storageKey(group: Group, occ: Date) {
-    const key = group.sessions.map((s) => s.id).join("+");
-    return `abmelden-prompt-${key}-${occ.toISOString()}`;
+function dismissalKey(group: Group, occ: Date) {
+    const ids = group.sessions.map((s) => s.id).join("+");
+    return `abmelden-prompt-${ids}-${occ.toISOString()}`;
 }
 
-export default function PostTrainingPrompt({ sessions, userId }: Props) {
+function isDismissed(group: Group, occ: Date): boolean {
+    try {
+        return !!localStorage.getItem(dismissalKey(group, occ));
+    } catch {
+        // localStorage unavailable or corrupt — treat as not dismissed and clear
+        try { localStorage.removeItem(dismissalKey(group, occ)); } catch { /* ignore */ }
+        return false;
+    }
+}
+
+function markDismissed(group: Group, occ: Date) {
+    try {
+        localStorage.setItem(dismissalKey(group, occ), "seen");
+    } catch { /* ignore write errors */ }
+}
+
+export default function PostTrainingPrompt({ sessions, userId, registeredSessionIds }: Props) {
     const router = useRouter();
     const [state, setState] = useState<{ pending: Group[]; current: number } | null>(null);
 
     useEffect(() => {
-        const isDev = process.env.NODE_ENV === "development";
         const groups = buildGroups(sessions);
         const pending = groups.filter((g) => {
+            // Training must have already happened this week
             const occ = groupOccurrence(g);
             if (!occ) return false;
-            return isDev || !localStorage.getItem(storageKey(g, occ));
+
+            // Server says user is not registered → nothing to prompt about
+            const isRegistered = g.sessions.some((s) =>
+                registeredSessionIds.includes(s.id),
+            );
+            if (!isRegistered) return false;
+
+            // User already dismissed this prompt this week
+            return !isDismissed(g, occ);
         });
         setState(pending.length > 0 ? { pending, current: 0 } : null);
-    }, [sessions, userId]);
+    }, [sessions, userId, registeredSessionIds]);
 
     if (!state) return null;
 
@@ -59,27 +84,25 @@ export default function PostTrainingPrompt({ sessions, userId }: Props) {
     const total = state.pending.length;
     const isLast = state.current + 1 >= total;
 
-    function markSeen() {
-        const occ = groupOccurrence(group);
-        if (occ) localStorage.setItem(storageKey(group, occ), "seen");
-    }
-
     function advance(didAbmelden: boolean) {
         if (!isLast) {
             setState((prev) => prev && { ...prev, current: prev.current + 1 });
         } else {
             setState(null);
+            // Only refresh the server component when something actually changed
             if (didAbmelden) router.refresh();
         }
     }
 
     function close() {
-        markSeen();
+        const occ = groupOccurrence(group);
+        if (occ) markDismissed(group, occ);
         advance(false);
     }
 
     async function abmelden() {
-        markSeen();
+        const occ = groupOccurrence(group);
+        if (occ) markDismissed(group, occ);
         for (const session of group.sessions) {
             await abmeldenAction(session.id, userId);
         }

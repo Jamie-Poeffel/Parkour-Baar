@@ -57,6 +57,7 @@ export default async function MitgliederPage() {
     const statusMap = Object.fromEntries(
         sessionData.map((d) => [d.sessionId, d.angemeldet]),
     );
+
     const groupsWithMeta = groups.map((g) => {
         const nextDate = g.sessions.reduce<Date>((min, s) => {
             const d = nextOccurrenceDate(s.day);
@@ -80,7 +81,11 @@ export default async function MitgliederPage() {
 
     return (
         <div className="min-h-screen bg-neutral-50">
-            <PostTrainingPrompt sessions={training.sessions} userId={userId} />
+            <PostTrainingPrompt
+                    sessions={training.sessions}
+                    userId={userId}
+                    registeredSessionIds={sessionData.filter(d => d.angemeldet).map(d => d.sessionId)}
+                />
             <Navigation />
 
             <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-10 space-y-6">
