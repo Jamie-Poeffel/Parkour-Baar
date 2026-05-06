@@ -7,7 +7,6 @@ import { SignOutBtn } from "@/components/SignOutBtn";
 import { Navigation } from "@/components/Navigation";
 import { hasPermission, getRole } from "@/utils/permissions";
 import { getSiteData } from "@/utils/site-data";
-import type { Session } from "@/utils/site-data";
 import { getTrainingSnapshot, anmeldenFuerTraining } from "@/utils/trainings";
 import PostTrainingPrompt from "@/app/abmelden/PostTrainingPrompt";
 import { buildGroups, DAY_INDEX } from "@/utils/session-groups";
@@ -24,7 +23,7 @@ function nextOccurrenceDate(dayName: string): Date {
 }
 
 function formatDate(d: Date): string {
-    return d.toLocaleDateString("de-CH", { weekday: "long", day: "numeric", month: "long" });
+    return d.toLocaleDateString("de-CH", { day: "numeric", month: "long" });
 }
 
 export default async function MitgliederPage() {
@@ -46,13 +45,18 @@ export default async function MitgliederPage() {
             if (!inParticipants && !inAbgemeldet) {
                 await anmeldenFuerTraining(s.id, userId);
             }
-            return { sessionId: s.id, angemeldet: inParticipants || (!inAbgemeldet) };
+            return {
+                sessionId: s.id,
+                angemeldet: inParticipants || !inAbgemeldet,
+            };
         }),
     );
 
     // Build next-training card data
     const groups = buildGroups(training.sessions);
-    const statusMap = Object.fromEntries(sessionData.map((d) => [d.sessionId, d.angemeldet]));
+    const statusMap = Object.fromEntries(
+        sessionData.map((d) => [d.sessionId, d.angemeldet]),
+    );
     const groupsWithMeta = groups.map((g) => {
         const nextDate = g.sessions.reduce<Date>((min, s) => {
             const d = nextOccurrenceDate(s.day);
@@ -92,7 +96,9 @@ export default async function MitgliederPage() {
                         />
                     ) : (
                         <div className="w-16 h-16 rounded-full bg-neutral-900 flex items-center justify-center shrink-0">
-                            <span className="text-white font-bold text-xl">{initials}</span>
+                            <span className="text-white font-bold text-xl">
+                                {initials}
+                            </span>
                         </div>
                     )}
                     <div className="text-center sm:text-left">
@@ -116,7 +122,7 @@ export default async function MitgliederPage() {
 
                 {/* Next training card */}
                 {nextGroup && (
-                    <div className="bg-white rounded-xl border border-neutral-200 p-5 flex items-center justify-between gap-4">
+                    <div className="bg-white rounded-xl border border-neutral-200 p-5 flex lg:items-center md:items-start justify-between flex-col md:flex-row gap-4">
                         <div className="flex items-center gap-4 min-w-0">
                             <div className="w-10 h-10 rounded-lg bg-neutral-100 flex items-center justify-center shrink-0">
                                 <CalendarDays className="w-5 h-5 text-neutral-500" />
@@ -126,7 +132,13 @@ export default async function MitgliederPage() {
                                     Nächstes Training
                                 </p>
                                 <p className="font-bold text-neutral-900">
-                                    {nextGroup.sessions.map((s) => s.day).join(" + ")}
+                                    {[
+                                        ...new Set(
+                                            nextGroup.sessions.map(
+                                                (s) => s.day,
+                                            ),
+                                        ),
+                                    ].join(" + ")}
                                 </p>
                                 <p className="text-sm text-neutral-500">
                                     {formatDate(nextGroup.nextDate)}
@@ -134,12 +146,16 @@ export default async function MitgliederPage() {
                             </div>
                         </div>
                         <div className="flex items-center gap-3 shrink-0">
-                            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-                                nextGroup.allAngemeldet
-                                    ? "bg-green-50 text-green-700"
-                                    : "bg-neutral-100 text-neutral-400"
-                            }`}>
-                                {nextGroup.allAngemeldet ? "Angemeldet" : "Abgemeldet"}
+                            <span
+                                className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+                                    nextGroup.allAngemeldet
+                                        ? "bg-green-50 text-green-700"
+                                        : "bg-neutral-100 text-neutral-400"
+                                }`}
+                            >
+                                {nextGroup.allAngemeldet
+                                    ? "Angemeldet"
+                                    : "Abgemeldet"}
                             </span>
                             <Link
                                 href="/abmelden"
@@ -157,7 +173,9 @@ export default async function MitgliederPage() {
                         <div>
                             <div className="flex items-center gap-2 mb-5">
                                 <Mail className="w-4 h-4 text-neutral-400" />
-                                <h2 className="font-bold text-neutral-900">Kontakt</h2>
+                                <h2 className="font-bold text-neutral-900">
+                                    Kontakt
+                                </h2>
                             </div>
                             <a
                                 href={`mailto:${contact.email}`}
@@ -166,8 +184,8 @@ export default async function MitgliederPage() {
                                 {contact.email}
                             </a>
                             <p className="mt-2 text-xs text-neutral-400 leading-relaxed">
-                                Bei Fragen, Absenzen oder sonstigen Anliegen schreib uns
-                                einfach eine E-Mail.
+                                Bei Fragen, Absenzen oder sonstigen Anliegen
+                                schreib uns einfach eine E-Mail.
                             </p>
                         </div>
                         {contact.socials.length > 0 && (
@@ -191,7 +209,9 @@ export default async function MitgliederPage() {
                     <div className="bg-white rounded-xl border border-neutral-200 p-6">
                         <div className="flex items-center gap-2 mb-5">
                             <User className="w-4 h-4 text-neutral-400" />
-                            <h2 className="font-bold text-neutral-900">Konto</h2>
+                            <h2 className="font-bold text-neutral-900">
+                                Konto
+                            </h2>
                         </div>
                         <div className="flex flex-wrap gap-3">
                             <Link

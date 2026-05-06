@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { Session } from "@/utils/site-data";
 import { buildGroups, DAY_INDEX } from "@/utils/session-groups";
 import type { Group } from "@/utils/session-groups";
+import { abmeldenAction } from "./actions";
 
 type Props = {
     sessions: Session[];
@@ -24,7 +26,9 @@ function thisWeekOccurrence(dayName: string): Date | null {
 
 function groupOccurrence(group: Group): Date | null {
     // earliest session in the group that has already occurred this week
-    const occs = group.sessions.map((s) => thisWeekOccurrence(s.day)).filter(Boolean) as Date[];
+    const occs = group.sessions
+        .map((s) => thisWeekOccurrence(s.day))
+        .filter(Boolean) as Date[];
     if (occs.length === 0) return null;
     return occs.reduce((min, d) => (d < min ? d : min));
 }
@@ -35,6 +39,7 @@ function storageKey(group: Group, occ: Date) {
 }
 
 export default function PostTrainingPrompt({ sessions, userId }: Props) {
+    const router = useRouter();
     const [state, setState] = useState<{ pending: Group[]; current: number } | null>(null);
 
     useEffect(() => {
@@ -48,29 +53,46 @@ export default function PostTrainingPrompt({ sessions, userId }: Props) {
         setState(pending.length > 0 ? { pending, current: 0 } : null);
     }, [sessions, userId]);
 
-    function dismiss() {
-        if (!state) return;
-        const g = state.pending[state.current];
-        const occ = groupOccurrence(g);
-        if (occ) localStorage.setItem(storageKey(g, occ), "seen");
-        if (state.current + 1 < state.pending.length) {
-            setState((prev) => prev && { ...prev, current: prev.current + 1 });
-        } else {
-            setState(null);
-        }
-    }
-
     if (!state) return null;
 
     const group = state.pending[state.current];
     const total = state.pending.length;
-    const title = group.sessions.map((s) => s.day).join(" + ");
-    const subtitle = group.sessions.map((s) => `${s.time}${s.level ? ` · ${s.level}` : ""}`).join("  |  ");
+    const isLast = state.current + 1 >= total;
+
+    function markSeen() {
+        const occ = groupOccurrence(group);
+        if (occ) localStorage.setItem(storageKey(group, occ), "seen");
+    }
+
+    function advance(didAbmelden: boolean) {
+        if (!isLast) {
+            setState((prev) => prev && { ...prev, current: prev.current + 1 });
+        } else {
+            setState(null);
+            if (didAbmelden) router.refresh();
+        }
+    }
+
+    function close() {
+        markSeen();
+        advance(false);
+    }
+
+    async function abmelden() {
+        markSeen();
+        for (const session of group.sessions) {
+            await abmeldenAction(session.id, userId);
+        }
+        advance(true);
+    }
+
+    const days = [...new Set(group.sessions.map((s) => s.day))];
+    const title = days.join(" + ");
 
     return (
         <div className="fixed inset-0 z-50 flex flex-col bg-neutral-50">
             <button
-                onClick={dismiss}
+                onClick={close}
                 aria-label="Schliessen"
                 className="absolute top-5 left-5 flex items-center justify-center w-10 h-10 rounded-full bg-neutral-200 hover:bg-neutral-300 transition-colors text-neutral-700"
             >
@@ -97,31 +119,25 @@ export default function PostTrainingPrompt({ sessions, userId }: Props) {
             )}
 
             <div className="flex-1 flex flex-col items-center justify-center px-8 text-center gap-3">
-                <p className="text-xs font-bold tracking-[0.2em] uppercase text-neutral-400">
-                    {subtitle}
-                </p>
                 <h1 className="text-4xl font-black text-neutral-900 tracking-tight leading-tight">
-                    Training
-                    <br />
+                    {days.length > 1 ? <br /> : <> </>}
                     {title}
                 </h1>
                 <p className="text-neutral-500 text-base max-w-xs leading-relaxed mt-2">
-                    Das Training hat diese Woche stattgefunden. Möchtest du dich
-                    für nächste Woche abmelden?
+                    Möchtest du dich für nächste Woche abmelden?
                 </p>
             </div>
 
-            <div className="px-6 pb-10">
+            <div className="px-6 pb-10 flex flex-col gap-2">
                 <button
-                    onClick={dismiss}
-                    className="w-full py-4 bg-neutral-900 text-white text-base font-bold rounded-xl hover:bg-neutral-700 transition-colors"
+                    onClick={abmelden}
+                    className="w-full py-4 bg-neutral-900 border border-neutral-900 text-white text-base font-bold rounded-xl hover:bg-neutral-700 transition-colors"
                 >
                     Abmelden
                 </button>
-
                 <button
                     onClick={close}
-                    className="w-full py-4 bg-neutral-900 text-white text-base font-bold rounded-xl hover:bg-neutral-700 transition-colors"
+                    className="w-full py-4 border border-neutral-900 text-black text-base font-bold rounded-xl hover:bg-neutral-100 transition-colors"
                 >
                     Schliessen
                 </button>
