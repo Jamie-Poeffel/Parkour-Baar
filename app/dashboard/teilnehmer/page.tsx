@@ -91,14 +91,14 @@ export default async function TeilnehmerPage() {
                 {sessionData.map(({ session: s, participants, abgemeldet }) => (
                     <div key={s.id} className="bg-white rounded-xl border border-neutral-200">
                         {/* Session header */}
-                        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100">
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100 gap-3 flex-wrap">
                             <div>
                                 <p className="font-bold text-neutral-900">{s.day}</p>
                                 <p className="text-xs text-neutral-400 mt-0.5">
                                     {s.time} · {s.level}
                                 </p>
                             </div>
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 shrink-0">
                                 <span className="flex items-center gap-1.5 text-sm text-neutral-500">
                                     <Users className="w-4 h-4" /> {participants.length}
                                 </span>
@@ -108,7 +108,7 @@ export default async function TeilnehmerPage() {
                                         type="submit"
                                         className="px-3 py-1.5 text-xs font-semibold text-neutral-500 border border-neutral-200 rounded-md hover:border-red-300 hover:text-red-600 hover:bg-red-50 transition-colors"
                                     >
-                                        Liste zurücksetzen
+                                        <span className="hidden sm:inline">Liste </span>zurücksetzen
                                     </button>
                                 </form>
                             </div>

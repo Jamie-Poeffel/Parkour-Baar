@@ -199,7 +199,7 @@ function SessionForm({
     const others = allSessions.filter((s) => s.id !== session.id);
     return (
         <div className="p-4 space-y-3">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Field label="Tag">
                     <select
                         className={inputCls}

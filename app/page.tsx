@@ -59,7 +59,7 @@ export default async function Home() {
 
       {/* ── STATS BAR ── */}
       <section className="bg-neutral-900 text-white">
-        <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 divide-x divide-white/10">
+        <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 md:divide-x divide-white/10">
           {[
             { value: stats.members, label: "Mitglieder" },
             { value: stats.years, label: "Jahre Erfahrung" },
