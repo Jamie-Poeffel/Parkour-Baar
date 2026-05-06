@@ -6,13 +6,19 @@ export enum RoleType {
 }
 
 export type Permission =
-  | "dashboard:access"
-  | "dashboard:edit"
-  | "mitglieder:access";
+    | "dashboard:access"
+    | "dashboard:edit"
+    | "mitglieder:access"
+    | "teilnehmerliste:access";
 
 const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
-  admin: ["dashboard:access", "dashboard:edit", "mitglieder:access"],
-  member: ["mitglieder:access"],
+    admin: [
+        "dashboard:access",
+        "dashboard:edit",
+        "mitglieder:access",
+        "teilnehmerliste:access",
+    ],
+    member: ["mitglieder:access"],
 };
 
 export function hasPermission(

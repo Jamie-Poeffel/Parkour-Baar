@@ -57,15 +57,27 @@ function markDismissed(group: Group, occ: Date) {
 
 export default function PostTrainingPrompt({ sessions, userId, registeredSessionIds }: Props) {
     const router = useRouter();
-    const [state, setState] = useState<{ pending: Group[]; current: number } | null>(null);
+    const [isRefresh, setIsRefresh] = useState(false);
+    const [state, setState] = useState<{
+        pending: Group[];
+        current: number;
+    } | null>(null);
 
     useEffect(() => {
+        if (isRefresh) return;
         const isDev = process.env.NODE_ENV === "development";
+
         const groups = buildGroups(sessions);
 
         if (isDev) {
-            console.log("[PostTrainingPrompt] sessions:", sessions.map(s => s.day));
-            console.log("[PostTrainingPrompt] registeredSessionIds:", registeredSessionIds);
+            console.log(
+                "[PostTrainingPrompt] sessions:",
+                sessions.map((s) => s.day),
+            );
+            console.log(
+                "[PostTrainingPrompt] registeredSessionIds:",
+                registeredSessionIds,
+            );
         }
 
         const pending = groups.filter((g) => {
@@ -73,8 +85,14 @@ export default function PostTrainingPrompt({ sessions, userId, registeredSession
 
             if (isDev) {
                 console.log(
-                    `[PostTrainingPrompt] group ${g.sessions.map(s => s.day).join("+")}:`,
-                    { occ, isRegistered: g.sessions.some(s => registeredSessionIds.includes(s.id)), isDismissed: occ ? isDismissed(g, occ) : "n/a" }
+                    `[PostTrainingPrompt] group ${g.sessions.map((s) => s.day).join("+")}:`,
+                    {
+                        occ,
+                        isRegistered: g.sessions.some((s) =>
+                            registeredSessionIds.includes(s.id),
+                        ),
+                        isDismissed: occ ? isDismissed(g, occ) : "n/a",
+                    },
                 );
             }
 
@@ -108,7 +126,10 @@ export default function PostTrainingPrompt({ sessions, userId, registeredSession
         } else {
             setState(null);
             // Only refresh the server component when something actually changed
-            if (didAbmelden) router.refresh();
+            if (didAbmelden) {
+                setIsRefresh(true);
+                router.refresh();
+            }
         }
     }
 
@@ -170,16 +191,16 @@ export default function PostTrainingPrompt({ sessions, userId, registeredSession
                 </p>
             </div>
 
-            <div className="px-6 pb-10 flex flex-col gap-2">
+            <div className="px-6 pb-10 items-center flex flex-col gap-2">
                 <button
                     onClick={abmelden}
-                    className="w-full py-4 bg-neutral-900 border border-neutral-900 text-white text-base font-bold rounded-xl hover:bg-neutral-700 transition-colors"
+                    className="w-full py-4 max-w-xl bg-neutral-900 border border-neutral-900 text-white text-base font-bold rounded-xl hover:bg-neutral-700 transition-colors"
                 >
                     Abmelden
                 </button>
                 <button
                     onClick={close}
-                    className="w-full py-4 border border-neutral-900 text-black text-base font-bold rounded-xl hover:bg-neutral-100 transition-colors"
+                    className="w-full py-4 max-w-xl border border-neutral-900 text-black text-base font-bold rounded-xl hover:bg-neutral-100 transition-colors"
                 >
                     Schliessen
                 </button>
