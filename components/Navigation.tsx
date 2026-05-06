@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Menu, X, LayoutDashboard, Users } from "lucide-react";
 import { useAuth, useUser, useClerk } from "@clerk/nextjs";
-import { hasPermission } from "@/lib/permissions";
+import { hasPermission } from "@/utils/permissions";
 
 export function Navigation() {
   const pathname = usePathname();

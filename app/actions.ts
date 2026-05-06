@@ -8,7 +8,7 @@ import {
   type Session,
   type Social,
   type Technique,
-} from "@/lib/site-data";
+} from "@/utils/site-data";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 

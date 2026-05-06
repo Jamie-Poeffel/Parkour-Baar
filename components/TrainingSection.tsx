@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { ChevronDown, MapPin, Clock } from "lucide-react";
-import type { Session } from "@/lib/site-data";
+import type { Session } from "@/utils/site-data";
+import { buildGroups } from "@/utils/session-groups";
 
 type SessionStatus = { sessionId: string; angemeldet: boolean };
 
@@ -15,41 +16,6 @@ type Props = {
     onAnmeldenAll: (trainingIds: string[]) => Promise<void>;
     onAbmeldenAll: (trainingIds: string[]) => Promise<void>;
 };
-
-type Group = { sessions: Session[]; linked: boolean };
-
-function buildGroups(sessions: Session[]): Group[] {
-    const visited = new Set<string>();
-    const groups: Group[] = [];
-
-    for (const s of sessions) {
-        if (visited.has(s.id)) continue;
-        visited.add(s.id);
-
-        if (s.linkedTo) {
-            const linked = sessions.find((x) => x.id === s.linkedTo);
-            if (linked && !visited.has(linked.id)) {
-                visited.add(linked.id);
-                groups.push({ sessions: [s, linked], linked: true });
-                continue;
-            }
-        }
-
-        // Check if another session links to this one
-        const linksToThis = sessions.find(
-            (x) => x.linkedTo === s.id && !visited.has(x.id),
-        );
-        if (linksToThis) {
-            visited.add(linksToThis.id);
-            groups.push({ sessions: [s, linksToThis], linked: true });
-            continue;
-        }
-
-        groups.push({ sessions: [s], linked: false });
-    }
-
-    return groups;
-}
 
 function StatusBadge({ angemeldet }: { angemeldet: boolean }) {
     return (

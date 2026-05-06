@@ -2,9 +2,9 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Users, Calendar, ExternalLink, Pencil } from "lucide-react";
-import { getSiteData } from "@/lib/site-data";
+import { getSiteData } from "@/utils/site-data";
 import { Navigation } from "@/components/Navigation";
-import { hasPermission, getRole } from "@/lib/permissions";
+import { hasPermission, getRole } from "@/utils/permissions";
 
 export default async function DashboardPage() {
   const { userId } = await auth();

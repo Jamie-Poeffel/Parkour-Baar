@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { getSiteData } from "@/lib/site-data";
+import { getSiteData } from "@/utils/site-data";
 import { EditClient } from "./EditClient";
 
 export default async function EditPage() {

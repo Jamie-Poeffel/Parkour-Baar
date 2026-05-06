@@ -1,4 +1,4 @@
-import { db } from "@/lib/firebase-admin";
+import { db } from "@/utils/firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 
 // 0 = Sunday, 1 = Monday, …, 6 = Saturday (matches JS getDay())

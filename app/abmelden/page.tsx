@@ -1,9 +1,9 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { Navigation } from "@/components/Navigation";
-import { hasPermission, getRole } from "@/lib/permissions";
-import { getSiteData } from "@/lib/site-data";
-import { getTrainingSnapshot, anmeldenFuerTraining, abmeldenVonTraining } from "@/lib/trainings";
+import { hasPermission, getRole } from "@/utils/permissions";
+import { getSiteData } from "@/utils/site-data";
+import { getTrainingSnapshot, anmeldenFuerTraining, abmeldenVonTraining } from "@/utils/trainings";
 import { revalidatePath } from "next/cache";
 
 export default async function AbmeldenPage() {

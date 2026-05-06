@@ -2,9 +2,9 @@ import { auth, currentUser, clerkClient } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Users } from "lucide-react";
-import { getTrainingSnapshot, abmeldenVonTraining, resetTraining } from "@/lib/trainings";
-import { getSiteData } from "@/lib/site-data";
-import { hasPermission, getRole } from "@/lib/permissions";
+import { getTrainingSnapshot, abmeldenVonTraining, resetTraining } from "@/utils/trainings";
+import { getSiteData } from "@/utils/site-data";
+import { hasPermission, getRole } from "@/utils/permissions";
 import { revalidatePath } from "next/cache";
 
 async function resolveUsers(ids: string[]) {

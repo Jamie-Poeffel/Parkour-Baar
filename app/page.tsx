@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Navigation } from "@/components/Navigation";
 import { ArrowRight, ChevronDown } from "lucide-react";
-import { getSiteData } from "@/lib/site-data";
+import { getSiteData } from "@/utils/site-data";
 
 export default async function Home() {
   const { about, stats } = await getSiteData();

@@ -1,7 +1,7 @@
 import { Navigation } from "@/components/Navigation";
 import Link from "next/link";
 import { Mail, MapPin, Clock } from "lucide-react";
-import { getSiteData } from "@/lib/site-data";
+import { getSiteData } from "@/utils/site-data";
 import { KontaktClient } from "./KontaktClient";
 
 export default async function KontaktPage() {

@@ -2,7 +2,7 @@ import { Navigation } from "@/components/Navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Clock, MapPin } from "lucide-react";
-import { getSiteData } from "@/lib/site-data";
+import { getSiteData } from "@/utils/site-data";
 
 export default async function TrainingPage() {
   const { training, techniques } = await getSiteData();
