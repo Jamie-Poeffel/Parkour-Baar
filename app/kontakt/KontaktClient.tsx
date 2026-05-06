@@ -17,8 +17,7 @@ export function KontaktClient({ email }: { email: string }) {
           Probestunde
         </h2>
         <p className="mt-4 text-white/60 leading-relaxed">
-          Komm einfach zu einem unserer Trainings vorbei. Schreib uns kurz eine
-          E-Mail und wir bestätigen den Termin.
+          Schreib uns kurz eine E-Mail und wir bestätigen den Termin.
         </p>
       </div>
       <button
