@@ -62,9 +62,26 @@ export default function PostTrainingPrompt({ sessions, userId, registeredSession
     useEffect(() => {
         const isDev = process.env.NODE_ENV === "development";
         const groups = buildGroups(sessions);
+
+        if (isDev) {
+            console.log("[PostTrainingPrompt] sessions:", sessions.map(s => s.day));
+            console.log("[PostTrainingPrompt] registeredSessionIds:", registeredSessionIds);
+        }
+
         const pending = groups.filter((g) => {
-            // Training must have already happened this week
             const occ = groupOccurrence(g);
+
+            if (isDev) {
+                console.log(
+                    `[PostTrainingPrompt] group ${g.sessions.map(s => s.day).join("+")}:`,
+                    { occ, isRegistered: g.sessions.some(s => registeredSessionIds.includes(s.id)), isDismissed: occ ? isDismissed(g, occ) : "n/a" }
+                );
+            }
+
+            // In dev bypass all guards so you can always test the prompt
+            if (isDev) return occ !== null;
+
+            // Training must have already happened this week
             if (!occ) return false;
 
             // Server says user is not registered → nothing to prompt about
@@ -72,9 +89,6 @@ export default function PostTrainingPrompt({ sessions, userId, registeredSession
                 registeredSessionIds.includes(s.id),
             );
             if (!isRegistered) return false;
-
-            // In dev always show (so you can test without clearing localStorage)
-            if (isDev) return true;
 
             // User already dismissed this prompt this week
             return !isDismissed(g, occ);
