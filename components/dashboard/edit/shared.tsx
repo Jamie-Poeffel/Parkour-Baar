@@ -71,12 +71,14 @@ export function SaveButton({ pending, saved }: { pending: boolean; saved: boolea
 export function Field({
     label,
     children,
+    className = "",
 }: {
     label: string;
     children: React.ReactNode;
+    className?: string;
 }) {
     return (
-        <div className="space-y-1.5">
+        <div className={`space-y-1.5 ${className}`}>
             <label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
                 {label}
             </label>

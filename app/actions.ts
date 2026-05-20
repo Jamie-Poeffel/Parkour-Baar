@@ -8,6 +8,7 @@ import {
   type Session,
   type Social,
   type Technique,
+  type Partner,
 } from "@/utils/site-data";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -126,6 +127,30 @@ export async function deleteSession(id: string) {
   data.stats.sessionsPerWeek = data.training.sessions.length.toString();
   await saveSiteData(data);
   revalidatePath("/training");
+  revalidatePath("/");
+  revalidatePath("/dashboard/edit");
+}
+
+export async function upsertPartner(partner: Partner) {
+  await requireAuth();
+  const data = await getSiteData();
+  if (!data.partners) data.partners = [];
+  const idx = data.partners.findIndex((p) => p.id === partner.id);
+  if (idx >= 0) {
+    data.partners[idx] = partner;
+  } else {
+    data.partners.push(partner);
+  }
+  await saveSiteData(data);
+  revalidatePath("/");
+  revalidatePath("/dashboard/edit");
+}
+
+export async function deletePartner(id: string) {
+  await requireAuth();
+  const data = await getSiteData();
+  data.partners = (data.partners ?? []).filter((p) => p.id !== id);
+  await saveSiteData(data);
   revalidatePath("/");
   revalidatePath("/dashboard/edit");
 }

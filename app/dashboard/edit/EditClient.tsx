@@ -20,61 +20,63 @@ import { SessionsSection } from "@/components/dashboard/edit/SessionsSection";
 import { StatsSection } from "@/components/dashboard/edit/StatsSection";
 import { AboutSection } from "@/components/dashboard/edit/AboutSection";
 import { ContactSection } from "@/components/dashboard/edit/ContactSection";
-import { TechniquesSection } from "@/components/dashboard/edit/TechniquesSection";
+import { PartnersSection } from "@/components/dashboard/edit/PartnersSections";
 import type { SiteData } from "@/utils/site-data";
 
 type Props = { data: SiteData };
 
 export function EditClient({ data }: Props) {
-  return (
-    <div className="min-h-screen bg-neutral-50">
-      <header className="bg-white border-b border-neutral-200 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3 min-w-0">
-            <Image
-              src="/dark_icon.png"
-              alt="Parkour Baar"
-              width={24}
-              height={24}
-              className="object-contain shrink-0"
-            />
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900 transition-colors shrink-0"
-            >
-              <ArrowLeft className="w-4 h-4" /> Dashboard
-            </Link>
-            <span className="text-neutral-300 hidden sm:inline">/</span>
-            <span className="text-sm font-semibold text-neutral-900 hidden sm:inline truncate">
-              Website bearbeiten
-            </span>
-          </div>
-          <SignOutBtn />
-        </div>
-      </header>
+    return (
+        <div className="min-h-screen bg-neutral-50">
+            <header className="bg-white border-b border-neutral-200 sticky top-0 z-10">
+                <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
+                    <div className="flex items-center gap-3 min-w-0">
+                        <Image
+                            src="/dark_icon.png"
+                            alt="Parkour Baar"
+                            width={24}
+                            height={24}
+                            className="object-contain shrink-0"
+                        />
+                        <Link
+                            href="/dashboard"
+                            className="flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900 transition-colors shrink-0"
+                        >
+                            <ArrowLeft className="w-4 h-4" /> Dashboard
+                        </Link>
+                        <span className="text-neutral-300 hidden sm:inline">
+                            /
+                        </span>
+                        <span className="text-sm font-semibold text-neutral-900 hidden sm:inline truncate">
+                            Website bearbeiten
+                        </span>
+                    </div>
+                    <SignOutBtn />
+                </div>
+            </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-10 space-y-6">
-        <div className="mb-2">
-          <h1 className="text-2xl font-black text-neutral-900 tracking-tight">
-            Website bearbeiten
-          </h1>
-          <p className="text-neutral-500 mt-1 text-sm">
-            Änderungen werden sofort auf der Website aktualisiert.
-          </p>
-        </div>
+            <main className="max-w-4xl mx-auto px-6 py-10 space-y-6">
+                <div className="mb-2">
+                    <h1 className="text-2xl font-black text-neutral-900 tracking-tight">
+                        Website bearbeiten
+                    </h1>
+                    <p className="text-neutral-500 mt-1 text-sm">
+                        Änderungen werden sofort auf der Website aktualisiert.
+                    </p>
+                </div>
 
-        <SessionsSection
-          initial={data.training.sessions}
-          location={data.training.location}
-        />
-        <TechniquesSection initial={data.techniques ?? []} />
-        <StatsSection
-          initial={data.stats}
-          sessionsCount={data.training.sessions.length}
-        />
-        <AboutSection initial={data.about} />
-        <ContactSection initial={data.contact} />
-      </main>
-    </div>
-  );
+                <SessionsSection
+                    initial={data.training.sessions}
+                    location={data.training.location}
+                />
+                <StatsSection
+                    initial={data.stats}
+                    sessionsCount={data.training.sessions.length}
+                />
+                <PartnersSection initial={data.partners} />
+                <AboutSection initial={data.about} />
+                <ContactSection initial={data.contact} />
+            </main>
+        </div>
+    );
 }
