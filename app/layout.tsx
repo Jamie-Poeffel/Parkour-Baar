@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { getSiteData } from "@/utils/site-data";
 import { LogRocketInit } from "@/components/LogRocket";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -95,6 +96,9 @@ export default async function RootLayout({
           </footer>
         </body>
       </html>
+      {process.env.NEXT_PUBLIC_GA_ID && (
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+      )}
     </ClerkProvider>
   );
 }
