@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { getSiteData } from "@/utils/site-data";
+import { LogRocketInit } from "@/components/LogRocket";
 import "./globals.css";
 
 const inter = Inter({
@@ -34,6 +35,7 @@ export default async function RootLayout({
     <ClerkProvider dynamic>
       <html lang="de" className={inter.variable} suppressHydrationWarning>
         <body className="antialiased">
+          <LogRocketInit />
           {children}
           <footer className="py-8 border-t border-neutral-100">
             {partners.length > 0 && (

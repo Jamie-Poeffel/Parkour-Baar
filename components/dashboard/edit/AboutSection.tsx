@@ -12,6 +12,7 @@ import { Users } from "lucide-react";
 import { updateAbout } from "@/app/actions";
 import type { SiteData } from "@/utils/site-data";
 import { SectionCard, SaveButton, Field, textareaCls } from "./shared";
+import { trackEvent, captureException } from "@/components/LogRocket";
 
 export function AboutSection({ initial }: { initial: SiteData["about"] }) {
     const [about, setAbout] = useState(initial);
@@ -21,9 +22,14 @@ export function AboutSection({ initial }: { initial: SiteData["about"] }) {
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         startTransition(async () => {
-            await updateAbout(about.text1, about.text2);
-            setSaved(true);
-            setTimeout(() => setSaved(false), 2000);
+            try {
+                await updateAbout(about.text1, about.text2);
+                trackEvent("about_saved");
+                setSaved(true);
+                setTimeout(() => setSaved(false), 2000);
+            } catch (err) {
+                captureException(err instanceof Error ? err : new Error(String(err)));
+            }
         });
     }
 

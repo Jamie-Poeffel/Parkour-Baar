@@ -5,6 +5,7 @@ import { HandshakeIcon, Plus, Trash2, Save, Check } from "lucide-react";
 import { upsertPartner, deletePartner } from "@/app/actions";
 import type { Partner } from "@/utils/site-data";
 import { SectionCard, Field, inputCls } from "./shared";
+import { trackEvent, captureException } from "@/components/LogRocket";
 
 export function PartnersSection({ initial = [] }: { initial?: Partner[] }) {
     const [partners, setPartners] = useState<Partner[]>(initial);
@@ -21,24 +22,34 @@ export function PartnersSection({ initial = [] }: { initial?: Partner[] }) {
 
     function save(p: Partner) {
         startTransition(async () => {
-            await upsertPartner(p);
-            setPartners((prev) => {
-                const idx = prev.findIndex((x) => x.id === p.id);
-                return idx >= 0
-                    ? prev.map((x) => (x.id === p.id ? p : x))
-                    : [...prev, p];
-            });
-            setSavedId(p.id);
-            setEditing(null);
-            setTimeout(() => setSavedId(null), 2000);
+            try {
+                await upsertPartner(p);
+                trackEvent("partner_saved");
+                setPartners((prev) => {
+                    const idx = prev.findIndex((x) => x.id === p.id);
+                    return idx >= 0
+                        ? prev.map((x) => (x.id === p.id ? p : x))
+                        : [...prev, p];
+                });
+                setSavedId(p.id);
+                setEditing(null);
+                setTimeout(() => setSavedId(null), 2000);
+            } catch (err) {
+                captureException(err instanceof Error ? err : new Error(String(err)));
+            }
         });
     }
 
     function remove(id: string) {
         if (!confirm("Partner löschen?")) return;
         startTransition(async () => {
-            await deletePartner(id);
-            setPartners((prev) => prev.filter((p) => p.id !== id));
+            try {
+                await deletePartner(id);
+                trackEvent("partner_deleted");
+                setPartners((prev) => prev.filter((p) => p.id !== id));
+            } catch (err) {
+                captureException(err instanceof Error ? err : new Error(String(err)));
+            }
         });
     }
 

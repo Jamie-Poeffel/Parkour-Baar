@@ -19,6 +19,7 @@ import {
 } from "@/app/actions";
 import type { Social, SiteData } from "@/utils/site-data";
 import { SectionCard, Field, inputCls } from "./shared";
+import { trackEvent, captureException } from "@/components/LogRocket";
 
 export function ContactSection({ initial }: { initial: SiteData["contact"] }) {
     const [email, setEmail] = useState(initial.email);
@@ -30,32 +31,47 @@ export function ContactSection({ initial }: { initial: SiteData["contact"] }) {
 
     function saveEmail() {
         startTransition(async () => {
-            await updateEmail(email);
-            setEmailSaved(true);
-            setTimeout(() => setEmailSaved(false), 2000);
+            try {
+                await updateEmail(email);
+                trackEvent("email_saved");
+                setEmailSaved(true);
+                setTimeout(() => setEmailSaved(false), 2000);
+            } catch (err) {
+                captureException(err instanceof Error ? err : new Error(String(err)));
+            }
         });
     }
 
     function saveSocial(s: Social) {
         startTransition(async () => {
-            await upsertSocial(s);
-            setSocials((prev) => {
-                const idx = prev.findIndex((x) => x.id === s.id);
-                return idx >= 0
-                    ? prev.map((x) => (x.id === s.id ? s : x))
-                    : [...prev, s];
-            });
-            setSavedId(s.id);
-            setEditing(null);
-            setTimeout(() => setSavedId(null), 2000);
+            try {
+                await upsertSocial(s);
+                trackEvent("social_saved");
+                setSocials((prev) => {
+                    const idx = prev.findIndex((x) => x.id === s.id);
+                    return idx >= 0
+                        ? prev.map((x) => (x.id === s.id ? s : x))
+                        : [...prev, s];
+                });
+                setSavedId(s.id);
+                setEditing(null);
+                setTimeout(() => setSavedId(null), 2000);
+            } catch (err) {
+                captureException(err instanceof Error ? err : new Error(String(err)));
+            }
         });
     }
 
     function removeSocial(id: string) {
         if (!confirm("Social Link löschen?")) return;
         startTransition(async () => {
-            await deleteSocial(id);
-            setSocials((prev) => prev.filter((s) => s.id !== id));
+            try {
+                await deleteSocial(id);
+                trackEvent("social_deleted");
+                setSocials((prev) => prev.filter((s) => s.id !== id));
+            } catch (err) {
+                captureException(err instanceof Error ? err : new Error(String(err)));
+            }
         });
     }
 
