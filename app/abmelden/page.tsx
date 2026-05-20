@@ -5,6 +5,7 @@ import { hasPermission, getRole } from "@/utils/permissions";
 import { getSiteData } from "@/utils/site-data";
 import { getTrainingSnapshot, anmeldenFuerTraining, abmeldenVonTraining } from "@/utils/trainings";
 import { revalidatePath } from "next/cache";
+import { logger } from "@/lib/axiom/server";
 
 export default async function AbmeldenPage() {
     const { userId } = await auth();
@@ -30,16 +31,34 @@ export default async function AbmeldenPage() {
         "use server";
         const trainingId = formData.get("trainingId") as string;
         if (!trainingId || !userId) return;
-        await anmeldenFuerTraining(trainingId, userId);
-        revalidatePath("/abmelden");
+        const start = Date.now();
+        try {
+            await anmeldenFuerTraining(trainingId, userId);
+            revalidatePath("/abmelden");
+            logger.info("action:handleAnmelden", { trainingId, userId, durationMs: Date.now() - start });
+        } catch (err) {
+            logger.error("action:handleAnmelden:error", { trainingId, userId, error: String(err), durationMs: Date.now() - start });
+            throw err;
+        } finally {
+            await logger.flush();
+        }
     }
 
     async function handleAbmelden(formData: FormData) {
         "use server";
         const trainingId = formData.get("trainingId") as string;
         if (!trainingId || !userId) return;
-        await abmeldenVonTraining(trainingId, userId);
-        revalidatePath("/abmelden");
+        const start = Date.now();
+        try {
+            await abmeldenVonTraining(trainingId, userId);
+            revalidatePath("/abmelden");
+            logger.info("action:handleAbmelden", { trainingId, userId, durationMs: Date.now() - start });
+        } catch (err) {
+            logger.error("action:handleAbmelden:error", { trainingId, userId, error: String(err), durationMs: Date.now() - start });
+            throw err;
+        } finally {
+            await logger.flush();
+        }
     }
 
     return (

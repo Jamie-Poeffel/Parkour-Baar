@@ -6,6 +6,7 @@ import { getTrainingSnapshot, abmeldenVonTraining, resetTraining } from "@/utils
 import { getSiteData } from "@/utils/site-data";
 import { hasPermission, getRole } from "@/utils/permissions";
 import { revalidatePath } from "next/cache";
+import { logger } from "@/lib/axiom/server";
 
 async function resolveUsers(ids: string[]) {
     if (ids.length === 0) return [];
@@ -56,16 +57,34 @@ export default async function TeilnehmerPage() {
         const trainingId = formData.get("trainingId") as string;
         const targetUserId = formData.get("userId") as string;
         if (!trainingId || !targetUserId) return;
-        await abmeldenVonTraining(trainingId, targetUserId);
-        revalidatePath("/dashboard/teilnehmer");
+        const start = Date.now();
+        try {
+            await abmeldenVonTraining(trainingId, targetUserId);
+            revalidatePath("/dashboard/teilnehmer");
+            logger.info("action:handleEntfernen", { trainingId, targetUserId, adminId: userId, durationMs: Date.now() - start });
+        } catch (err) {
+            logger.error("action:handleEntfernen:error", { trainingId, targetUserId, adminId: userId, error: String(err), durationMs: Date.now() - start });
+            throw err;
+        } finally {
+            await logger.flush();
+        }
     }
 
     async function handleReset(formData: FormData) {
         "use server";
         const trainingId = formData.get("trainingId") as string;
         if (!trainingId) return;
-        await resetTraining(trainingId);
-        revalidatePath("/dashboard/teilnehmer");
+        const start = Date.now();
+        try {
+            await resetTraining(trainingId);
+            revalidatePath("/dashboard/teilnehmer");
+            logger.info("action:handleReset", { trainingId, adminId: userId, durationMs: Date.now() - start });
+        } catch (err) {
+            logger.error("action:handleReset:error", { trainingId, adminId: userId, error: String(err), durationMs: Date.now() - start });
+            throw err;
+        } finally {
+            await logger.flush();
+        }
     }
 
     return (
