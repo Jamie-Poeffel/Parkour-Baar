@@ -42,19 +42,63 @@ export async function POST(req: Request) {
     const { type, data } = event;
 
     if (type === "session.created") {
-        logger.info("auth:login", {
+        logger.info("auth:session.created", {
             userId: data.user_id,
             sessionId: data.id,
             clientId: data.client_id,
             status: data.status,
         });
-    } else if (type === "session.ended" || type === "session.removed" || type === "session.revoked") {
-        logger.info("auth:logout", {
+    } else if (type === "session.ended") {
+        logger.info("auth:session.ended", {
             userId: data.user_id,
             sessionId: data.id,
             clientId: data.client_id,
             status: data.status,
-            eventType: type,
+        });
+    } else if (type === "session.pending") {
+        logger.info("auth:session.pending", {
+            userId: data.user_id,
+            sessionId: data.id,
+            clientId: data.client_id,
+            status: data.status,
+        });
+    } else if (type === "session.removed") {
+        logger.info("auth:session.removed", {
+            userId: data.user_id,
+            sessionId: data.id,
+            clientId: data.client_id,
+        });
+    } else if (type === "session.revoked") {
+        logger.info("auth:session.revoked", {
+            userId: data.user_id,
+            sessionId: data.id,
+            clientId: data.client_id,
+        });
+    } else if (type === "email.created") {
+        logger.info("auth:email.created", {
+            userId: data.user_id,
+            emailAddressId: data.email_address_id,
+            slug: data.slug,
+            status: data.status,
+        });
+    } else if (type === "user.created") {
+        logger.info("auth:user.created", {
+            userId: data.id,
+            email: (data.email_addresses as Array<{ email_address: string }>)?.[0]?.email_address,
+            firstName: data.first_name,
+            lastName: data.last_name,
+        });
+    } else if (type === "user.updated") {
+        logger.info("auth:user.updated", {
+            userId: data.id,
+            email: (data.email_addresses as Array<{ email_address: string }>)?.[0]?.email_address,
+            firstName: data.first_name,
+            lastName: data.last_name,
+        });
+    } else if (type === "user.deleted") {
+        logger.info("auth:user.deleted", {
+            userId: data.id,
+            deleted: data.deleted,
         });
     }
 
