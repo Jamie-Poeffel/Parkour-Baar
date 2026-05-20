@@ -5,8 +5,7 @@ export default function robots(): MetadataRoute.Robots {
         rules: [
             {
                 userAgent: "*",
-                allow: "/",
-                disallow: ["/dashboard/", "/auth-redirect", "/login"],
+                disallow: "/",
             },
             // Block common scrapers and AI crawlers
             {
