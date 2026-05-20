@@ -12,9 +12,27 @@ const isProtected = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
+  const start = Date.now();
+  const { userId } = await auth();
+
   logger.info("request", {
     method: req.method,
     path: req.nextUrl.pathname,
+    query: req.nextUrl.search || undefined,
+    host: req.nextUrl.host,
+    userId: userId ?? "anonymous",
+    ip:
+      req.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
+      req.headers.get("x-real-ip") ??
+      "unknown",
+    userAgent: req.headers.get("user-agent") ?? "unknown",
+    referer: req.headers.get("referer") ?? undefined,
+    country: req.geo?.country ?? undefined,
+    city: req.geo?.city ?? undefined,
+    region: req.geo?.region ?? undefined,
+    isProtected: isProtected(req),
+    isAdmin: isAdminRoute(req),
+    durationMs: Date.now() - start,
   });
   await logger.flush();
 
