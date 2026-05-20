@@ -7,7 +7,6 @@ import {
   type SiteData,
   type Session,
   type Social,
-  type Technique,
   type Partner,
 } from "@/utils/site-data";
 import { revalidatePath } from "next/cache";
@@ -96,29 +95,6 @@ export async function upsertSession(session: Session) {
   revalidatePath("/dashboard/edit");
 }
 
-export async function upsertTechnique(technique: Technique) {
-  await requireAuth();
-  const data = await getSiteData();
-  if (!data.techniques) data.techniques = [];
-  const idx = data.techniques.findIndex((t) => t.id === technique.id);
-  if (idx >= 0) {
-    data.techniques[idx] = technique;
-  } else {
-    data.techniques.push(technique);
-  }
-  await saveSiteData(data);
-  revalidatePath("/training");
-  revalidatePath("/dashboard/edit");
-}
-
-export async function deleteTechnique(id: string) {
-  await requireAuth();
-  const data = await getSiteData();
-  data.techniques = (data.techniques ?? []).filter((t) => t.id !== id);
-  await saveSiteData(data);
-  revalidatePath("/training");
-  revalidatePath("/dashboard/edit");
-}
 
 export async function deleteSession(id: string) {
   await requireAuth();
