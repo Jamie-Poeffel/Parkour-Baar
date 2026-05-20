@@ -1,7 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { hasPermission } from "@/utils/permissions";
-import { Logger } from "next-axiom";
+import { logger } from "@/lib/axiom/server";
 
 const isAdminRoute = createRouteMatcher(["/dashboard(.*)"]);
 const isProtected = createRouteMatcher([
@@ -12,12 +12,11 @@ const isProtected = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-  const log = new Logger({ source: "proxy" });
-  log.info("request", {
+  logger.info("request", {
     method: req.method,
     path: req.nextUrl.pathname,
   });
-  await log.flush();
+  await logger.flush();
 
   if (!isProtected(req)) return;
 

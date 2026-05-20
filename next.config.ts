@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 import { readFileSync } from "fs";
 import { resolve } from "path";
-import { withAxiom } from "next-axiom";
 
 const { version } = JSON.parse(
     readFileSync(resolve(process.cwd(), "package.json"), "utf-8"),
@@ -51,4 +50,4 @@ const nextConfig: NextConfig = {
     },
 };
 
-export default withAxiom(nextConfig);
+export default nextConfig;
