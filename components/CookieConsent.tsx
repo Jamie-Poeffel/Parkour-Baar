@@ -61,8 +61,8 @@ export function CookieConsent() {
 
     return (
         <>
-            {/* Load GA only after consent */}
-            {consent === "accepted" && gaId && (
+            {/* Load GA only after consent and only in production */}
+            {consent === "accepted" && gaId && process.env.NODE_ENV === "production" && (
                 <>
                     <Script
                         src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
