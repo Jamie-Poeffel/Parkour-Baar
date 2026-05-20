@@ -2,7 +2,7 @@ import { Axiom } from "@axiomhq/js";
 import { Logger, AxiomJSTransport, ConsoleTransport } from "@axiomhq/logging";
 import { createAxiomRouteHandler, nextJsFormatters } from "@axiomhq/nextjs";
 
-const axiomClient = new Axiom({ token: process.env.AXIOM_TOKEN!, url: "https://api.eu.axiom.co" });
+const axiomClient = new Axiom({ token: process.env.AXIOM_TOKEN!, url: "https://eu-central-1.aws.edge.axiom.co" });
 
 export const logger = new Logger({
     transports: [
