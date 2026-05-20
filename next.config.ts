@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
         return [
             {
                 source: "/gtag/:path*",
-                destination: "https://www.googletagmanager.com/:path*",
+                destination: "https://www.googletagmanager.com/gtag/:path*",
             },
         ];
     },
