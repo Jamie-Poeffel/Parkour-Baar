@@ -87,11 +87,18 @@ export default async function RootLayout({
                 </div>
               </div>
             )}
-            <p className="text-center">
+            <div className="flex items-center justify-center gap-4">
               <span className="text-xs font-mono text-neutral-400">
                 v{process.env.NEXT_PUBLIC_APP_VERSION}
               </span>
-            </p>
+              <span className="text-neutral-200">|</span>
+              <a
+                href="/datenschutz"
+                className="text-xs text-neutral-400 hover:text-neutral-600 transition-colors"
+              >
+                Datenschutz
+              </a>
+            </div>
           </footer>
         </body>
       </html>
