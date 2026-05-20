@@ -6,7 +6,7 @@ import { getSiteData } from "@/utils/site-data";
 import framePic from "@/public/pic_2.png";
 
 export default async function TrainingPage() {
-    const { training, techniques } = await getSiteData();
+    const { training } = await getSiteData();
 
     return (
         <>
