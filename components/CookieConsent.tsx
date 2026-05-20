@@ -65,7 +65,7 @@ export function CookieConsent() {
             {consent === "accepted" && gaId && process.env.NODE_ENV === "production" && (
                 <>
                     <Script
-                        src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+                        src={`/gtag/js?id=${gaId}`}
                         strategy="afterInteractive"
                     />
                     <Script id="ga-init" strategy="afterInteractive">{`
