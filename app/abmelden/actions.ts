@@ -2,18 +2,29 @@
 
 import { revalidatePath } from "next/cache";
 import { abmeldenVonTraining } from "@/utils/trainings";
-import { logger } from "@/lib/axiom/server";
+import { requestLogger as logger } from "@/lib/axiom/request-logger";
+import { startTimer, getDurationMs } from "@/lib/axiom/timing";
 
 export async function abmeldenAction(trainingsId: string, userId: string) {
-    const start = Date.now();
-    try {
-        await abmeldenVonTraining(trainingsId, userId);
-        revalidatePath("/mitglieder");
-        logger.info("action:abmeldenAction", { trainingsId, userId, durationMs: Date.now() - start });
-    } catch (err) {
-        logger.error("action:abmeldenAction:error", { trainingsId, userId, error: String(err), durationMs: Date.now() - start });
-        throw err;
-    } finally {
-        await logger.flush();
-    }
+  const start = startTimer();
+
+  try {
+    await abmeldenVonTraining(trainingsId, userId);
+    revalidatePath("/mitglieder");
+
+    await logger.info("action:abmeldenAction", {
+      trainingsId,
+      userId,
+      durationMs: getDurationMs(start),
+    });
+  } catch (err) {
+    await logger.error("action:abmeldenAction:error", {
+      trainingsId,
+      userId,
+      error: String(err),
+      durationMs: getDurationMs(start),
+    });
+
+    throw err;
+  }
 }

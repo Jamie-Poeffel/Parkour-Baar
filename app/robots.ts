@@ -1,34 +1,32 @@
 import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-    return {
-        rules: [
-            {
-                userAgent: "*",
-                disallow: "/",
-            },
-            // Block common scrapers and AI crawlers
-            {
-                userAgent: [
-                    "GPTBot",
-                    "ChatGPT-User",
-                    "Google-Extended",
-                    "CCBot",
-                    "anthropic-ai",
-                    "Claude-Web",
-                    "Applebot-Extended",
-                    "FacebookBot",
-                    "Bytespider",
-                    "PetalBot",
-                    "Scrapy",
-                    "SemrushBot",
-                    "AhrefsBot",
-                    "MJ12bot",
-                    "DotBot",
-                ],
-                disallow: "/",
-            },
+  return {
+    rules: [
+      // Allow search engines and AI search crawlers
+      {
+        userAgent: [
+          "Googlebot",
+          "Bingbot",
+          "GPTBot",
+          "OAI-SearchBot",
+          "ChatGPT-User",
+          "ClaudeBot",
+          "Claude-SearchBot",
+          "PerplexityBot",
+          "Applebot",
+          "DuckAssistBot",
         ],
-        sitemap: "https://parkourbaar.ch/sitemap.xml",
-    };
+        allow: "/",
+      },
+
+      // Default rule for all other crawlers
+      {
+        userAgent: "*",
+        allow: "/",
+      },
+    ],
+
+    sitemap: "https://parkourbaar.ch/sitemap.xml",
+  };
 }

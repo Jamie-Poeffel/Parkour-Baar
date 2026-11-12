@@ -2,101 +2,189 @@ import { Navigation } from "@/components/Navigation";
 import Link from "next/link";
 
 export const metadata = {
-    title: "Datenschutz – Parkour Baar",
-    description: "Datenschutzerklärung von Parkour Baar",
+  title: "Datenschutz – Parkour Baar",
+  description: "Datenschutzerklärung von Parkour Baar",
 };
 
 export default function DatenschutzPage() {
-    return (
-        <>
-            <Navigation />
+  return (
+    <>
+      <Navigation />
 
-            <section className="pt-32 pb-16 px-6 bg-white">
-                <div className="max-w-3xl mx-auto">
-                    <p className="text-xs font-bold tracking-[0.2em] uppercase text-[#566246] mb-4">
-                        Rechtliches
-                    </p>
-                    <h1 className="text-5xl md:text-6xl font-black tracking-tight text-neutral-900 leading-none">
-                        Datenschutz.
-                    </h1>
-                </div>
-            </section>
+      <section className="pt-32 pb-16 px-6 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <p className="text-xs font-bold tracking-[0.2em] uppercase text-[#566246] mb-4">
+            Rechtliches
+          </p>
+          <h1 className="text-5xl md:text-6xl font-black tracking-tight text-neutral-900 leading-none">
+            Datenschutz.
+          </h1>
+        </div>
+      </section>
 
-            <section className="pb-24 px-6">
-                <div className="max-w-3xl mx-auto space-y-10 text-neutral-700 leading-relaxed">
+      <section className="pb-24 px-6">
+        <div className="max-w-3xl mx-auto space-y-10 text-neutral-700 leading-relaxed">
+          <div>
+            <h2 className="text-xl font-black text-neutral-900 mb-3">
+              1. Verantwortlicher
+            </h2>
+            <p>
+              Parkour Baar
+              <br />
+              Baar, Schweiz
+              <br />
+              Kontakt:{" "}
+              <Link
+                href="/kontakt"
+                className="underline underline-offset-2 hover:text-neutral-900 transition-colors"
+              >
+                Kontaktseite
+              </Link>
+            </p>
+          </div>
 
-                    <div>
-                        <h2 className="text-xl font-black text-neutral-900 mb-3">1. Verantwortlicher</h2>
-                        <p>
-                            Parkour Baar<br />
-                            Baar, Schweiz<br />
-                            Kontakt: <Link href="/kontakt" className="underline underline-offset-2 hover:text-neutral-900 transition-colors">parkourbaar.ch/kontakt</Link>
-                        </p>
-                    </div>
+          <div>
+            <h2 className="text-xl font-black text-neutral-900 mb-3">
+              2. Erhebung und Verarbeitung von Daten
+            </h2>
+            <p>
+              Beim Besuch unserer Website können technische Daten wie
+              IP-Adresse, Zeitpunkt des Zugriffs, Browserinformationen und
+              aufgerufene Seiten verarbeitet werden. Diese Daten dienen dem
+              technischen Betrieb, der Sicherheit und der Fehleranalyse unserer
+              Website. Wir verarbeiten personenbezogene Daten nur im Rahmen der
+              geltenden Datenschutzbestimmungen.
+            </p>
+          </div>
 
-                    <div>
-                        <h2 className="text-xl font-black text-neutral-900 mb-3">2. Cookies & Tracking</h2>
-                        <p>
-                            Wir setzen Cookies und ähnliche Technologien nur nach deiner ausdrücklichen Zustimmung ein.
-                            Du kannst deine Einwilligung jederzeit widerrufen, indem du den Browserspeicher
-                            (localStorage) löschst oder unsere Website in einem privaten Fenster öffnest.
-                        </p>
-                    </div>
+          <div>
+            <h2 className="text-xl font-black text-neutral-900 mb-3">
+              3. Hosting und Bereitstellung
+            </h2>
+            <p>
+              Unsere Website wird auf Amazon Web Services (AWS) mit Amazon ECS
+              und AWS Fargate betrieben. Cloudflare wird als vorgelagerter
+              Dienst für die Bereitstellung und Absicherung der Website
+              eingesetzt.
+            </p>
+            <p className="mt-3">
+              Im Rahmen dieser Dienste können technische Verbindungsdaten,
+              insbesondere IP-Adressen und Informationen zu Anfragen,
+              verarbeitet werden. Dabei können Daten auch durch die jeweiligen
+              Dienstleister verarbeitet werden. Weitere Informationen findest du
+              in den{" "}
+              <a
+                href="https://aws.amazon.com/privacy/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2 hover:text-neutral-900 transition-colors"
+              >
+                Datenschutzinformationen von AWS
+              </a>{" "}
+              und der{" "}
+              <a
+                href="https://www.cloudflare.com/privacypolicy/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2 hover:text-neutral-900 transition-colors"
+              >
+                Datenschutzerklärung von Cloudflare
+              </a>
+              .
+            </p>
+          </div>
 
-                    <div>
-                        <h2 className="text-xl font-black text-neutral-900 mb-3">3. Google Analytics</h2>
-                        <p>
-                            Mit deiner Zustimmung verwenden wir Google Analytics 4 (Google LLC, USA), um anonymisierte
-                            Nutzungsstatistiken zu erheben (besuchte Seiten, Verweildauer, ungefähre Herkunft).
-                            Es werden keine personenbezogenen Daten ohne Einwilligung weitergegeben.
-                            Weitere Informationen: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-neutral-900 transition-colors">policies.google.com/privacy</a>.
-                        </p>
-                    </div>
+          <div>
+            <h2 className="text-xl font-black text-neutral-900 mb-3">
+              4. Server-Logging und Fehleranalyse
+            </h2>
+            <p>
+              Zur Überwachung des technischen Betriebs und zur Analyse von
+              Fehlern verwenden wir Axiom. Dabei können technische Ereignisse,
+              Fehlermeldungen, Zeitstempel und weitere in den Protokollen
+              enthaltene Informationen verarbeitet werden. Personenbezogene
+              Daten können betroffen sein, sofern sie in solchen Protokollen
+              enthalten sind.
+            </p>
+            <p className="mt-3">
+              Weitere Informationen findest du in der{" "}
+              <a
+                href="https://axiom.co/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2 hover:text-neutral-900 transition-colors"
+              >
+                Datenschutzerklärung von Axiom
+              </a>
+              .
+            </p>
+          </div>
 
-                    <div>
-                        <h2 className="text-xl font-black text-neutral-900 mb-3">4. LogRocket</h2>
-                        <p>
-                            Mit deiner Zustimmung nutzen wir LogRocket (LogRocket Inc., USA) zur
-                            Session-Aufzeichnung und Fehleranalyse. LogRocket kann Interaktionen auf der Website
-                            aufzeichnen, um technische Probleme zu beheben. Weitere Informationen:{" "}
-                            <a href="https://logrocket.com/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-neutral-900 transition-colors">logrocket.com/privacy</a>.
-                        </p>
-                    </div>
+          <div>
+            <h2 className="text-xl font-black text-neutral-900 mb-3">
+              5. Authentifizierung und Mitgliederbereich
+            </h2>
+            <p>
+              Für die Anmeldung und den geschützten Mitgliederbereich verwenden
+              wir Clerk. Im Rahmen der Authentifizierung können insbesondere
+              E-Mail-Adressen, Namen und technische Authentifizierungsdaten
+              verarbeitet werden.
+            </p>
+            <p className="mt-3">
+              Weitere Informationen findest du in der{" "}
+              <a
+                href="https://clerk.com/legal/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2 hover:text-neutral-900 transition-colors"
+              >
+                Datenschutzerklärung von Clerk
+              </a>
+              .
+            </p>
+          </div>
 
-                    <div>
-                        <h2 className="text-xl font-black text-neutral-900 mb-3">5. Hosting</h2>
-                        <p>
-                            Diese Website wird über Vercel (Vercel Inc., USA) gehostet. Beim Aufruf der Website
-                            werden technisch notwendige Daten (IP-Adresse, Browser, Zeitstempel) vorübergehend
-                            in Server-Logs gespeichert. Weitere Informationen:{" "}
-                            <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-neutral-900 transition-colors">vercel.com/legal/privacy-policy</a>.
-                        </p>
-                    </div>
+          <div>
+            <h2 className="text-xl font-black text-neutral-900 mb-3">
+              6. Cookies und lokaler Speicher
+            </h2>
+            <p>
+              Unsere Website kann Cookies und lokale Speichermechanismen
+              verwenden, beispielsweise für die Anmeldung, die Verwaltung von
+              Sitzungen oder gespeicherte Einstellungen. Welche Technologien
+              tatsächlich eingesetzt werden, hängt von den verwendeten
+              Funktionen ab. Nicht notwendige Tracking- oder
+              Analyse-Technologien werden nur eingesetzt, sofern die
+              erforderliche Rechtsgrundlage und gegebenenfalls eine Einwilligung
+              vorliegen.
+            </p>
+          </div>
 
-                    <div>
-                        <h2 className="text-xl font-black text-neutral-900 mb-3">6. Authentifizierung</h2>
-                        <p>
-                            Für den geschlossenen Mitgliederbereich verwenden wir Clerk (Clerk Inc., USA).
-                            Dabei werden E-Mail-Adresse und Name verarbeitet. Weitere Informationen:{" "}
-                            <a href="https://clerk.com/legal/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-neutral-900 transition-colors">clerk.com/legal/privacy</a>.
-                        </p>
-                    </div>
+          <div>
+            <h2 className="text-xl font-black text-neutral-900 mb-3">
+              7. Deine Rechte
+            </h2>
+            <p>
+              Im Rahmen des anwendbaren Datenschutzrechts hast du insbesondere
+              Rechte auf Auskunft und, sofern die gesetzlichen Voraussetzungen
+              erfüllt sind, Berichtigung, Löschung und Einschränkung der
+              Bearbeitung deiner personenbezogenen Daten. Du kannst dich mit
+              entsprechenden Anliegen über unsere{" "}
+              <Link
+                href="/kontakt"
+                className="underline underline-offset-2 hover:text-neutral-900 transition-colors"
+              >
+                Kontaktseite
+              </Link>{" "}
+              an uns wenden.
+            </p>
+          </div>
 
-                    <div>
-                        <h2 className="text-xl font-black text-neutral-900 mb-3">7. Deine Rechte</h2>
-                        <p>
-                            Du hast das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der
-                            Verarbeitung deiner Daten sowie das Recht auf Datenübertragbarkeit.
-                            Wende dich dazu an uns über die{" "}
-                            <Link href="/kontakt" className="underline underline-offset-2 hover:text-neutral-900 transition-colors">Kontaktseite</Link>.
-                        </p>
-                    </div>
-
-                    <p className="text-sm text-neutral-400 pt-4 border-t border-neutral-100">
-                        Stand: {new Date().toLocaleDateString("de-CH", { month: "long", year: "numeric" })}
-                    </p>
-                </div>
-            </section>
-        </>
-    );
+          <p className="text-sm text-neutral-400 pt-4 border-t border-neutral-100">
+            Stand: Oktober 2026
+          </p>
+        </div>
+      </section>
+    </>
+  );
 }

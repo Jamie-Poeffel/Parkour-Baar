@@ -11,7 +11,8 @@ import {
 } from "@/utils/site-data";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { logger } from "@/lib/axiom/server";
+import { requestLogger as logger } from "@/lib/axiom/request-logger";
+import { startTimer, getDurationMs } from "@/lib/axiom/timing";
 
 async function requireAuth() {
   const { userId } = await auth();
@@ -19,16 +20,28 @@ async function requireAuth() {
   return userId;
 }
 
-async function logAction(name: string, meta: Record<string, unknown>, fn: () => Promise<void>) {
-  const start = Date.now();
+async function logAction(
+  name: string,
+  meta: Record<string, unknown>,
+  fn: () => Promise<void>,
+) {
+  const start = startTimer();
+
   try {
     await fn();
-    logger.info(`action:${name}`, { ...meta, durationMs: Date.now() - start });
+
+    await logger.info(`action:${name}`, {
+      ...meta,
+      durationMs: getDurationMs(start),
+    });
   } catch (err) {
-    logger.error(`action:${name}:error`, { ...meta, error: String(err), durationMs: Date.now() - start });
+    await logger.error(`action:${name}:error`, {
+      ...meta,
+      error: String(err),
+      durationMs: getDurationMs(start),
+    });
+
     throw err;
-  } finally {
-    await logger.flush();
   }
 }
 
@@ -68,19 +81,23 @@ export async function updateEmail(email: string) {
 
 export async function upsertSocial(social: Social) {
   const userId = await requireAuth();
-  await logAction("upsertSocial", { userId, socialId: social.id, label: social.label }, async () => {
-    const data = await getSiteData();
-    const idx = data.contact.socials.findIndex((s) => s.id === social.id);
-    if (idx >= 0) {
-      data.contact.socials[idx] = social;
-    } else {
-      data.contact.socials.push(social);
-    }
-    await saveSiteData(data);
-    revalidatePath("/kontakt");
-    revalidatePath("/mitglieder");
-    revalidatePath("/dashboard/edit");
-  });
+  await logAction(
+    "upsertSocial",
+    { userId, socialId: social.id, label: social.label },
+    async () => {
+      const data = await getSiteData();
+      const idx = data.contact.socials.findIndex((s) => s.id === social.id);
+      if (idx >= 0) {
+        data.contact.socials[idx] = social;
+      } else {
+        data.contact.socials.push(social);
+      }
+      await saveSiteData(data);
+      revalidatePath("/kontakt");
+      revalidatePath("/mitglieder");
+      revalidatePath("/dashboard/edit");
+    },
+  );
 }
 
 export async function deleteSocial(id: string) {
@@ -108,20 +125,24 @@ export async function updateLocation(location: string) {
 
 export async function upsertSession(session: Session) {
   const userId = await requireAuth();
-  await logAction("upsertSession", { userId, sessionId: session.id, day: session.day }, async () => {
-    const data = await getSiteData();
-    const idx = data.training.sessions.findIndex((s) => s.id === session.id);
-    if (idx >= 0) {
-      data.training.sessions[idx] = session;
-    } else {
-      data.training.sessions.push(session);
-    }
-    data.stats.sessionsPerWeek = data.training.sessions.length.toString();
-    await saveSiteData(data);
-    revalidatePath("/training");
-    revalidatePath("/");
-    revalidatePath("/dashboard/edit");
-  });
+  await logAction(
+    "upsertSession",
+    { userId, sessionId: session.id, day: session.day },
+    async () => {
+      const data = await getSiteData();
+      const idx = data.training.sessions.findIndex((s) => s.id === session.id);
+      if (idx >= 0) {
+        data.training.sessions[idx] = session;
+      } else {
+        data.training.sessions.push(session);
+      }
+      data.stats.sessionsPerWeek = data.training.sessions.length.toString();
+      await saveSiteData(data);
+      revalidatePath("/training");
+      revalidatePath("/");
+      revalidatePath("/dashboard/edit");
+    },
+  );
 }
 
 export async function deleteSession(id: string) {
@@ -139,19 +160,23 @@ export async function deleteSession(id: string) {
 
 export async function upsertPartner(partner: Partner) {
   const userId = await requireAuth();
-  await logAction("upsertPartner", { userId, partnerId: partner.id, name: partner.name }, async () => {
-    const data = await getSiteData();
-    if (!data.partners) data.partners = [];
-    const idx = data.partners.findIndex((p) => p.id === partner.id);
-    if (idx >= 0) {
-      data.partners[idx] = partner;
-    } else {
-      data.partners.push(partner);
-    }
-    await saveSiteData(data);
-    revalidatePath("/");
-    revalidatePath("/dashboard/edit");
-  });
+  await logAction(
+    "upsertPartner",
+    { userId, partnerId: partner.id, name: partner.name },
+    async () => {
+      const data = await getSiteData();
+      if (!data.partners) data.partners = [];
+      const idx = data.partners.findIndex((p) => p.id === partner.id);
+      if (idx >= 0) {
+        data.partners[idx] = partner;
+      } else {
+        data.partners.push(partner);
+      }
+      await saveSiteData(data);
+      revalidatePath("/");
+      revalidatePath("/dashboard/edit");
+    },
+  );
 }
 
 export async function deletePartner(id: string) {

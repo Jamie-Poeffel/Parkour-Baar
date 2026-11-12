@@ -10,6 +10,17 @@
 !.yarn/releases
 !.yarn/versions
 
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/app-secrets.json
+terraform/*.tfplan
+terraform/*.tfvars
+
+/secrets
+
+secrets/firebase-service-account.json
+
 # testing
 /coverage
 
@@ -41,3 +52,10 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# Oracle deployment secrets
+deploy/app.env
+deploy/tunnel.env
+deploy/.env
+deploy/.env.*
+!deploy/.env.example
