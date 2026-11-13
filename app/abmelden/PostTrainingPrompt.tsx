@@ -144,7 +144,7 @@ export default function PostTrainingPrompt({ sessions, userId, registeredSession
         // will no longer be in registeredSessionIds, which suppresses the prompt
         // on all future renders without relying on a local entry.
         for (const session of group.sessions) {
-            await abmeldenAction(session.id, userId);
+            await abmeldenAction(session.id);
         }
         advance(true);
     }

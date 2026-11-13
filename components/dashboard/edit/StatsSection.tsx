@@ -13,6 +13,7 @@
 import { useState, useTransition } from "react";
 import { BarChart2 } from "lucide-react";
 import { updateStats } from "@/app/actions";
+import { reportClientError } from "@/lib/axiom/report-client-error";
 import type { SiteData } from "@/utils/site-data";
 import { SectionCard, SaveButton, Field, inputCls } from "./shared";
 
@@ -30,9 +31,13 @@ export function StatsSection({
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         startTransition(async () => {
-            await updateStats(stats);
-            setSaved(true);
-            setTimeout(() => setSaved(false), 2000);
+            try {
+                await updateStats(stats);
+                setSaved(true);
+                setTimeout(() => setSaved(false), 2000);
+            } catch (err) {
+                reportClientError("dashboard.stats.save", err);
+            }
         });
     }
 

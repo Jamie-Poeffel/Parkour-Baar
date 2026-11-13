@@ -4,8 +4,8 @@ import { useState, useTransition } from "react";
 import { HandshakeIcon, Plus, Trash2, Save, Check } from "lucide-react";
 import { upsertPartner, deletePartner } from "@/app/actions";
 import type { Partner } from "@/utils/site-data";
+import { reportClientError } from "@/lib/axiom/report-client-error";
 import { SectionCard, Field, inputCls } from "./shared";
-import { trackEvent, captureException } from "@/components/LogRocket";
 
 export function PartnersSection({ initial = [] }: { initial?: Partner[] }) {
     const [partners, setPartners] = useState<Partner[]>(initial);
@@ -24,7 +24,6 @@ export function PartnersSection({ initial = [] }: { initial?: Partner[] }) {
         startTransition(async () => {
             try {
                 await upsertPartner(p);
-                trackEvent("partner_saved");
                 setPartners((prev) => {
                     const idx = prev.findIndex((x) => x.id === p.id);
                     return idx >= 0
@@ -35,7 +34,7 @@ export function PartnersSection({ initial = [] }: { initial?: Partner[] }) {
                 setEditing(null);
                 setTimeout(() => setSavedId(null), 2000);
             } catch (err) {
-                captureException(err instanceof Error ? err : new Error(String(err)));
+                reportClientError("dashboard.partners.save", err);
             }
         });
     }
@@ -45,10 +44,9 @@ export function PartnersSection({ initial = [] }: { initial?: Partner[] }) {
         startTransition(async () => {
             try {
                 await deletePartner(id);
-                trackEvent("partner_deleted");
                 setPartners((prev) => prev.filter((p) => p.id !== id));
             } catch (err) {
-                captureException(err instanceof Error ? err : new Error(String(err)));
+                reportClientError("dashboard.partners.remove", err);
             }
         });
     }

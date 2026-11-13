@@ -19,8 +19,8 @@ import {
     deleteSession,
 } from "@/app/actions";
 import type { Session } from "@/utils/site-data";
+import { reportClientError } from "@/lib/axiom/report-client-error";
 import { SectionCard, Field, inputCls, DAYS } from "./shared";
-import { trackEvent, captureException } from "@/components/LogRocket";
 
 export function SessionsSection({
     initial,
@@ -47,7 +47,6 @@ export function SessionsSection({
         startTransition(async () => {
             try {
                 await upsertSession(s);
-                trackEvent("session_saved");
                 setSessions((prev) => {
                     const idx = prev.findIndex((x) => x.id === s.id);
                     return idx >= 0
@@ -58,7 +57,7 @@ export function SessionsSection({
                 setEditing(null);
                 setTimeout(() => setSavedId(null), 2000);
             } catch (err) {
-                captureException(err instanceof Error ? err : new Error(String(err)));
+                reportClientError("dashboard.sessions.save", err);
             }
         });
     }
@@ -68,10 +67,9 @@ export function SessionsSection({
         startTransition(async () => {
             try {
                 await deleteSession(id);
-                trackEvent("session_deleted");
                 setSessions((prev) => prev.filter((s) => s.id !== id));
             } catch (err) {
-                captureException(err instanceof Error ? err : new Error(String(err)));
+                reportClientError("dashboard.sessions.remove", err);
             }
         });
     }
@@ -80,11 +78,10 @@ export function SessionsSection({
         startTransition(async () => {
             try {
                 await updateLocation(location);
-                trackEvent("location_saved");
                 setSavedId("location");
                 setTimeout(() => setSavedId(null), 2000);
             } catch (err) {
-                captureException(err instanceof Error ? err : new Error(String(err)));
+                reportClientError("dashboard.sessions.saveLocation", err);
             }
         });
     }

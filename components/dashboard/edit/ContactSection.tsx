@@ -18,8 +18,8 @@ import {
     deleteSocial,
 } from "@/app/actions";
 import type { Social, SiteData } from "@/utils/site-data";
+import { reportClientError } from "@/lib/axiom/report-client-error";
 import { SectionCard, Field, inputCls } from "./shared";
-import { trackEvent, captureException } from "@/components/LogRocket";
 
 export function ContactSection({ initial }: { initial: SiteData["contact"] }) {
     const [email, setEmail] = useState(initial.email);
@@ -33,11 +33,10 @@ export function ContactSection({ initial }: { initial: SiteData["contact"] }) {
         startTransition(async () => {
             try {
                 await updateEmail(email);
-                trackEvent("email_saved");
                 setEmailSaved(true);
                 setTimeout(() => setEmailSaved(false), 2000);
             } catch (err) {
-                captureException(err instanceof Error ? err : new Error(String(err)));
+                reportClientError("dashboard.contact.saveEmail", err);
             }
         });
     }
@@ -46,7 +45,6 @@ export function ContactSection({ initial }: { initial: SiteData["contact"] }) {
         startTransition(async () => {
             try {
                 await upsertSocial(s);
-                trackEvent("social_saved");
                 setSocials((prev) => {
                     const idx = prev.findIndex((x) => x.id === s.id);
                     return idx >= 0
@@ -57,7 +55,7 @@ export function ContactSection({ initial }: { initial: SiteData["contact"] }) {
                 setEditing(null);
                 setTimeout(() => setSavedId(null), 2000);
             } catch (err) {
-                captureException(err instanceof Error ? err : new Error(String(err)));
+                reportClientError("dashboard.contact.saveSocial", err);
             }
         });
     }
@@ -67,10 +65,9 @@ export function ContactSection({ initial }: { initial: SiteData["contact"] }) {
         startTransition(async () => {
             try {
                 await deleteSocial(id);
-                trackEvent("social_deleted");
                 setSocials((prev) => prev.filter((s) => s.id !== id));
             } catch (err) {
-                captureException(err instanceof Error ? err : new Error(String(err)));
+                reportClientError("dashboard.contact.removeSocial", err);
             }
         });
     }

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
-import { captureException } from "@/components/LogRocket";
+import { reportClientError } from "@/lib/axiom/report-client-error";
 
 export default function Error({
   error,
@@ -12,8 +12,6 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    captureException(error);
-
     fetch("/api/log-error", {
       method: "POST",
       headers: {

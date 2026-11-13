@@ -18,6 +18,11 @@ export const logger = new Logger({
       : []),
   ],
   formatters: nextJsFormatters,
+  args: {
+    service: "parkour-baar",
+    version: process.env.NEXT_PUBLIC_APP_VERSION,
+    environment: process.env.NODE_ENV,
+  },
 });
 
 export const withAxiomRoute = createAxiomRouteHandler(logger);

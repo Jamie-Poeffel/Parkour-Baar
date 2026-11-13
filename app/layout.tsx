@@ -1,15 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import { ClerkProvider } from "@clerk/nextjs";
 import { getSiteData } from "@/utils/site-data";
 import { CookieConsent } from "@/components/CookieConsent";
+import { ClientErrorListener } from "@/components/ClientErrorListener";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
+const inter = localFont({
+  src: "../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2",
   variable: "--font-sans",
   display: "swap",
 });
+
+// Site content comes from Firestore, which isn't reachable (no credentials)
+// while the Docker image is built, so render per request instead of at build.
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Parkour Baar",
@@ -32,10 +37,11 @@ export default async function RootLayout({
   const partners = data.partners ?? [];
 
   return (
-    <ClerkProvider dynamic>
-      <html lang="de" className={inter.variable} suppressHydrationWarning>
-        <body className="antialiased">
+    <html lang="de" className={inter.variable} suppressHydrationWarning>
+      <body className="antialiased">
+        <ClerkProvider dynamic>
           <CookieConsent />
+          <ClientErrorListener />
           {children}
           <footer className="py-8 border-t border-neutral-100">
             {partners.length > 0 && (
@@ -82,7 +88,7 @@ export default async function RootLayout({
                           </span>
                         )}
                       </span>
-                    )
+                    ),
                   )}
                 </div>
               </div>
@@ -100,8 +106,8 @@ export default async function RootLayout({
               </a>
             </div>
           </footer>
-        </body>
-      </html>
-    </ClerkProvider>
+        </ClerkProvider>
+      </body>
+    </html>
   );
 }

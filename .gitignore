@@ -59,3 +59,14 @@ deploy/tunnel.env
 deploy/.env
 deploy/.env.*
 !deploy/.env.example
+
+# AWS terraform (state + secrets)
+terraform-aws/.terraform/
+terraform-aws/*.tfstate
+terraform-aws/*.tfstate.*
+terraform-aws/*.backup
+terraform-aws/app-secrets.json
+terraform-aws/*.tfvars
+terraform-aws/.env
+
+!.env.example

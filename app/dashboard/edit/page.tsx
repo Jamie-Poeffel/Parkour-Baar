@@ -1,11 +1,9 @@
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import { requirePermission } from "@/lib/auth";
 import { getSiteData } from "@/utils/site-data";
 import { EditClient } from "./EditClient";
 
 export default async function EditPage() {
-  const { userId } = await auth();
-  if (!userId) redirect("/login");
+  await requirePermission("dashboard:edit");
 
   const data = await getSiteData();
   return <EditClient data={data} />;

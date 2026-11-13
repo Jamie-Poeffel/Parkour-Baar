@@ -146,7 +146,30 @@ export default function DatenschutzPage() {
 
           <div>
             <h2 className="text-xl font-black text-neutral-900 mb-3">
-              6. Cookies und lokaler Speicher
+              6. Webanalyse
+            </h2>
+            <p>
+              Mit deiner Einwilligung (Cookie-Banner) verwenden wir Google
+              Analytics, um die Nutzung der Website statistisch auszuwerten.
+              Dabei können IP-Adressen, Geräte- und Browserinformationen sowie
+              aufgerufene Seiten an Google übermittelt werden. Ohne
+              Einwilligung wird Google Analytics nicht geladen. Weitere
+              Informationen findest du in der{" "}
+              <a
+                href="https://policies.google.com/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2 hover:text-neutral-900 transition-colors"
+              >
+                Datenschutzerklärung von Google
+              </a>
+              .
+            </p>
+          </div>
+
+          <div>
+            <h2 className="text-xl font-black text-neutral-900 mb-3">
+              7. Cookies und lokaler Speicher
             </h2>
             <p>
               Unsere Website kann Cookies und lokale Speichermechanismen
@@ -162,7 +185,7 @@ export default function DatenschutzPage() {
 
           <div>
             <h2 className="text-xl font-black text-neutral-900 mb-3">
-              7. Deine Rechte
+              8. Deine Rechte
             </h2>
             <p>
               Im Rahmen des anwendbaren Datenschutzrechts hast du insbesondere
