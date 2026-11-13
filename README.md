@@ -44,6 +44,6 @@ Useful messages: `request.completed`, `action:<name>`, `action:<name>:error`, `c
 
 ## Deployment
 
-- Oracle ARM64: `.github/workflows/oci-image.yml` builds the image to GHCR; `make deploy OCI_PUBLIC_IP=...` runs `deploy/deploy.ps1` (docker compose + Cloudflare tunnel).
+- Oracle ARM64: no CI. `make publish` builds and pushes the image to GHCR, then `make deploy OCI_PUBLIC_IP=...` runs `deploy/deploy.ps1` (docker compose + Cloudflare tunnel).
 - Vercel: `.github/workflows/deploy.yml` on the `release` branch.
 - Terraform: `terraform/` (Oracle), `terraform-aws/`. State and secrets are gitignored.
