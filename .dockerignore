@@ -2,11 +2,9 @@
 node_modules
 .next
 .git
-.vercel
 .env
 .env.*
 *.env
 deploy/
 terraform/
-terraform-aws/
 npm-debug.log*

@@ -1,9 +1,9 @@
-import admin from "firebase-admin";
-import type { Firestore } from "firebase-admin/firestore";
+import { cert, getApps, initializeApp } from "firebase-admin/app";
+import { getFirestore, type Firestore } from "firebase-admin/firestore";
 
 function getFirestoreInstance(): Firestore {
-  if (admin.apps.length > 0) {
-    return admin.firestore();
+  if (getApps().length > 0) {
+    return getFirestore();
   }
 
   const projectId = process.env.FIREBASE_PROJECT_ID;
@@ -18,15 +18,15 @@ function getFirestoreInstance(): Firestore {
     throw new Error("Firebase Admin environment variables are missing.");
   }
 
-  const app = admin.initializeApp({
-    credential: admin.credential.cert({
+  const app = initializeApp({
+    credential: cert({
       projectId,
       clientEmail,
       privateKey,
     }),
   });
 
-  return app.firestore();
+  return getFirestore(app);
 }
 
 export const db = new Proxy({} as Firestore, {

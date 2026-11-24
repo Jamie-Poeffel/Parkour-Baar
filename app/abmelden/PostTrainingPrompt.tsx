@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import type { Session } from "@/utils/site-data";
 import { buildGroups, DAY_INDEX } from "@/utils/session-groups";
 import type { Group } from "@/utils/session-groups";
+import { isTrainingDay } from "@/utils/school-holidays";
 import { abmeldenAction } from "./actions";
 
 type Props = {
@@ -23,6 +24,11 @@ function thisWeekOccurrence(dayName: string): Date | null {
     const d = new Date(now);
     d.setDate(now.getDate() - diff);
     d.setHours(0, 0, 0, 0);
+    // No training took place on a holiday, and nothing to sign off from if
+    // next week's training is a holiday too.
+    const nextWeek = new Date(d);
+    nextWeek.setDate(d.getDate() + 7);
+    if (!isTrainingDay(d) || !isTrainingDay(nextWeek)) return null;
     return d;
 }
 
@@ -55,81 +61,94 @@ function markDismissed(group: Group, occ: Date) {
     } catch { /* ignore write errors */ }
 }
 
-export default function PostTrainingPrompt({ sessions, userId, registeredSessionIds }: Props) {
-    const router = useRouter();
-    const [isRefresh, setIsRefresh] = useState(false);
-    const [state, setState] = useState<{
-        pending: Group[];
-        current: number;
-    } | null>(null);
+function computePending(
+    sessions: Session[],
+    registeredSessionIds: string[],
+): Group[] {
+    const isDev = process.env.NODE_ENV === "development";
 
-    useEffect(() => {
-        if (isRefresh) return;
-        const isDev = process.env.NODE_ENV === "development";
+    const groups = buildGroups(sessions);
 
-        const groups = buildGroups(sessions);
+    if (isDev) {
+        console.log(
+            "[PostTrainingPrompt] sessions:",
+            sessions.map((s) => s.day),
+        );
+        console.log(
+            "[PostTrainingPrompt] registeredSessionIds:",
+            registeredSessionIds,
+        );
+    }
+
+    const pending = groups.filter((g) => {
+        const occ = groupOccurrence(g);
 
         if (isDev) {
             console.log(
-                "[PostTrainingPrompt] sessions:",
-                sessions.map((s) => s.day),
-            );
-            console.log(
-                "[PostTrainingPrompt] registeredSessionIds:",
-                registeredSessionIds,
+                `[PostTrainingPrompt] group ${g.sessions.map((s) => s.day).join("+")}:`,
+                {
+                    occ,
+                    isRegistered: g.sessions.some((s) =>
+                        registeredSessionIds.includes(s.id),
+                    ),
+                    isDismissed: occ ? isDismissed(g, occ) : "n/a",
+                },
             );
         }
 
-        const pending = groups.filter((g) => {
-            const occ = groupOccurrence(g);
+        // In dev bypass all guards so you can always test the prompt
+        if (isDev) return occ !== null;
 
-            if (isDev) {
-                console.log(
-                    `[PostTrainingPrompt] group ${g.sessions.map((s) => s.day).join("+")}:`,
-                    {
-                        occ,
-                        isRegistered: g.sessions.some((s) =>
-                            registeredSessionIds.includes(s.id),
-                        ),
-                        isDismissed: occ ? isDismissed(g, occ) : "n/a",
-                    },
-                );
-            }
+        // Training must have already happened this week
+        if (!occ) return false;
 
-            // In dev bypass all guards so you can always test the prompt
-            if (isDev) return occ !== null;
+        // Server says user is not registered → nothing to prompt about
+        const isRegistered = g.sessions.some((s) =>
+            registeredSessionIds.includes(s.id),
+        );
+        if (!isRegistered) return false;
 
-            // Training must have already happened this week
-            if (!occ) return false;
+        // User already dismissed this prompt this week
+        return !isDismissed(g, occ);
+    });
+    return pending;
+}
 
-            // Server says user is not registered → nothing to prompt about
-            const isRegistered = g.sessions.some((s) =>
-                registeredSessionIds.includes(s.id),
-            );
-            if (!isRegistered) return false;
+const subscribeNoop = () => () => {};
 
-            // User already dismissed this prompt this week
-            return !isDismissed(g, occ);
-        });
-        setState(pending.length > 0 ? { pending, current: 0 } : null);
-    }, [sessions, userId, registeredSessionIds]);
+export default function PostTrainingPrompt({ sessions, registeredSessionIds }: Props) {
+    const router = useRouter();
+    // localStorage and the current date only exist in the browser, so wait for
+    // hydration before computing the prompt (avoids a server/client mismatch).
+    const hydrated = useSyncExternalStore(
+        subscribeNoop,
+        () => true,
+        () => false,
+    );
+    const [closed, setClosed] = useState(false);
+    const [current, setCurrent] = useState(0);
 
-    if (!state) return null;
+    const pending = useMemo(
+        () =>
+            hydrated && !closed
+                ? computePending(sessions, registeredSessionIds)
+                : [],
+        [hydrated, closed, sessions, registeredSessionIds],
+    );
 
-    const group = state.pending[state.current];
-    const total = state.pending.length;
-    const isLast = state.current + 1 >= total;
+    const group = pending[current];
+    if (!group) return null;
+
+    const total = pending.length;
+    const isLast = current + 1 >= total;
 
     function advance(didAbmelden: boolean) {
         if (!isLast) {
-            setState((prev) => prev && { ...prev, current: prev.current + 1 });
+            setCurrent((prev) => prev + 1);
         } else {
-            setState(null);
+            setClosed(true);
             // Only refresh the server component when something actually changed
-            if (didAbmelden) {
-                setIsRefresh(true);
-                router.refresh();
-            }
+            if (didAbmelden) router.refresh();
         }
     }
 
@@ -177,7 +196,7 @@ export default function PostTrainingPrompt({ sessions, userId, registeredSession
 
             {total > 1 && (
                 <p className="absolute top-6 right-6 text-xs font-semibold text-neutral-400 uppercase tracking-widest">
-                    {state.current + 1} / {total}
+                    {current + 1} / {total}
                 </p>
             )}
 

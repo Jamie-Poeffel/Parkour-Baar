@@ -45,7 +45,7 @@ export default async function TrainingPage() {
           <div className="absolute inset-0 flex items-center px-10">
             <blockquote className="text-white max-w-sm">
               <p className="text-2xl md:text-3xl font-bold leading-snug">
-                "Be strong to be useful."
+                &ldquo;Be strong to be useful.&rdquo;
               </p>
               <cite className="mt-3 block text-sm text-white/60 not-italic">
                 — Georges Hébert

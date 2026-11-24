@@ -76,6 +76,7 @@ export async function getSiteData(): Promise<SiteData> {
 
   if (!snap.exists) return DEFAULT;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- drop the server-only timestamp
   const { lastModified, ...siteData } = snap.data()!;
 
   return siteData as SiteData;

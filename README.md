@@ -13,7 +13,7 @@ npm run lint
 npm run build
 ```
 
-Required environment variables live in a single root `.env` (copy `.env.example`; never committed). Deploy and Terraform derive their files from it, so there is no second copy to keep in sync (`make sync-env` regenerates `terraform-aws/app-secrets.json`):
+Required environment variables live in a single root `.env` (copy `.env.example`; never committed). Deploy derives its files from it, so there is no second copy to keep in sync:
 
 | Variable | Purpose |
 | --- | --- |
@@ -45,5 +45,16 @@ Useful messages: `request.completed`, `action:<name>`, `action:<name>:error`, `c
 ## Deployment
 
 - Oracle ARM64: no CI. `make publish` builds and pushes the image to GHCR, then `make deploy OCI_PUBLIC_IP=...` runs `deploy/deploy.ps1` (docker compose + Cloudflare tunnel).
-- Vercel: `.github/workflows/deploy.yml` on the `release` branch.
-- Terraform: `terraform/` (Oracle), `terraform-aws/`. State and secrets are gitignored.
+- Terraform: `terraform/` (Oracle). State and secrets are gitignored.
+
+## Maintenance mode
+
+On the server a small `gateway` container sits in front of the app (Cloudflare tunnel → gateway → `web`). During a maintenance window it serves a 503 maintenance page (also whenever the app is down), pauses the active UptimeRobot monitors 60s before the start, and resumes exactly those 30s after the end.
+
+```
+make maintenance OCI_PUBLIC_IP=IP FROM="2026-11-20 22:00" TO="2026-11-21 02:00" MESSAGE="Datenbank-Update"
+make maintenance-status OCI_PUBLIC_IP=IP
+make maintenance-off OCI_PUBLIC_IP=IP     # end early, resumes monitors
+```
+
+Times are in your local machine time. Dates can be changed any time without redeploying. For UptimeRobot, copy `deploy/gateway.env.example` to `deploy/gateway.env` and set the main API key, then `make deploy`.

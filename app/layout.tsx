@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import Link from "next/link";
 import { ClerkProvider } from "@clerk/nextjs";
 import { getSiteData } from "@/utils/site-data";
 import { CookieConsent } from "@/components/CookieConsent";
@@ -98,12 +99,12 @@ export default async function RootLayout({
                 v{process.env.NEXT_PUBLIC_APP_VERSION}
               </span>
               <span className="text-neutral-200">|</span>
-              <a
+              <Link
                 href="/datenschutz"
                 className="text-xs text-neutral-400 hover:text-neutral-600 transition-colors"
               >
                 Datenschutz
-              </a>
+              </Link>
             </div>
           </footer>
         </ClerkProvider>

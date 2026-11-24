@@ -1,5 +1,5 @@
 
-.PHONY: all image build local configure infra publish deploy logs destroy sync-env
+.PHONY: all image build local configure infra publish deploy logs destroy maintenance maintenance-off maintenance-status
 
 # Configuration
 IMAGE_NAME ?= parkour-baar
@@ -7,7 +7,7 @@ GHCR_OWNER ?= jamie-poeffel
 GHCR_IMAGE = ghcr.io/$(GHCR_OWNER)/$(IMAGE_NAME)
 IMAGE_TAG ?= latest
 
-OCI_PUBLIC_IP ?=
+OCI_PUBLIC_IP ?= 89.168.89.219
 # Optional: path to the SSH key. If empty, deploy.ps1 uses ~/.ssh/id_ed25519 and ssh uses its defaults.
 SSH_KEY ?=
 SSH_KEY_OPT = $(if $(SSH_KEY),-i "$(SSH_KEY)")
@@ -29,9 +29,6 @@ local: image
 	-docker rm -f parkour-baar-test
 	docker run --rm --env-file .env -p 3000:3000 --name parkour-baar-test $(IMAGE_NAME):latest
 
-# Regenerate terraform-aws/app-secrets.json from the root .env
-sync-env:
-	node scripts/sync-env.mjs
 
 # Check OCI CLI and Terraform configuration
 configure:
@@ -76,6 +73,34 @@ ifndef OCI_PUBLIC_IP
 	$(error OCI_PUBLIC_IP is required)
 endif
 	ssh $(SSH_KEY_OPT) ubuntu@$(OCI_PUBLIC_IP) "cd /opt/parkour-baar && docker compose restart"
+
+# Schedule a maintenance window (times in this machine's local time):
+#   make maintenance OCI_PUBLIC_IP=IP FROM="2026-11-20 22:00" TO="2026-11-21 02:00" [MESSAGE="..."]
+maintenance:
+ifndef OCI_PUBLIC_IP
+	$(error OCI_PUBLIC_IP is required)
+endif
+ifndef FROM
+	$(error FROM and TO are required. Example: FROM="2026-11-20 22:00" TO="2026-11-21 02:00")
+endif
+ifndef TO
+	$(error FROM and TO are required)
+endif
+	powershell -NoProfile -ExecutionPolicy Bypass -File deploy/maintenance.ps1 -HostIp $(OCI_PUBLIC_IP) -Action set -From "$(FROM)" -To "$(TO)" $(if $(MESSAGE),-Message "$(MESSAGE)") $(if $(SSH_KEY),-SshKey "$(SSH_KEY)")
+
+# Cancel / end the maintenance window early (monitors are resumed)
+maintenance-off:
+ifndef OCI_PUBLIC_IP
+	$(error OCI_PUBLIC_IP is required)
+endif
+	powershell -NoProfile -ExecutionPolicy Bypass -File deploy/maintenance.ps1 -HostIp $(OCI_PUBLIC_IP) -Action off $(if $(SSH_KEY),-SshKey "$(SSH_KEY)")
+
+# Show the scheduled window, paused monitors and gateway log
+maintenance-status:
+ifndef OCI_PUBLIC_IP
+	$(error OCI_PUBLIC_IP is required)
+endif
+	powershell -NoProfile -ExecutionPolicy Bypass -File deploy/maintenance.ps1 -HostIp $(OCI_PUBLIC_IP) -Action status $(if $(SSH_KEY),-SshKey "$(SSH_KEY)")
 
 # Destroy Oracle infrastructure
 destroy:

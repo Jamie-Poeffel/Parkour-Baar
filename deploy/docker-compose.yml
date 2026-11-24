@@ -1,5 +1,6 @@
 services:
-  app:
+  # The Next.js app. Reached only through the gateway below.
+  web:
     image: ${APP_IMAGE:?Set APP_IMAGE in .env}
     platform: linux/arm64
     container_name: parkour-baar-app
@@ -13,11 +14,51 @@ services:
     expose:
       - "3000"
     healthcheck:
-      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:3000').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 45s
+
+  # Sits in front of the app: serves the maintenance page during a window from
+  # ./maintenance/maintenance.json (and whenever the app is down) and pauses /
+  # resumes the UptimeRobot monitors. It takes over the network alias "app" on
+  # :3000, so the Cloudflare tunnel's existing target (http://app:3000) is
+  # unchanged. The app container can be stopped or rebuilt during maintenance.
+  gateway:
+    image: node:22-alpine
+    platform: linux/arm64
+    container_name: parkour-baar-gateway
+    restart: unless-stopped
+    working_dir: /gateway
+    command: ["node", "server.mjs"]
+    env_file:
+      - path: ./gateway.env
+        required: false
+    environment:
+      PORT: "3000"
+      UPSTREAM: http://web:3000
+      DATA_DIR: /data
+      MAINTENANCE_TZ: Europe/Zurich
+    volumes:
+      - ./gateway:/gateway:ro
+      - ./maintenance:/data
+    networks:
+      default:
+        aliases:
+          - app
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      web:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:3000/__gateway/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   cloudflared:
     image: cloudflare/cloudflared:latest
@@ -28,5 +69,5 @@ services:
     env_file:
       - ./tunnel.env
     depends_on:
-      app:
+      gateway:
         condition: service_started

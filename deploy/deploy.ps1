@@ -33,8 +33,8 @@ function Resolve-Tool([string]$Name) {
 
 $script:SshExe = Resolve-Tool "ssh"
 $script:ScpExe = Resolve-Tool "scp"
-function ssh { & $script:SshExe @args }
-function scp { & $script:ScpExe @args }
+function ssh { & $script:SshExe -o ConnectTimeout=10 -o BatchMode=yes @args }
+function scp { & $script:ScpExe -o ConnectTimeout=10 -o BatchMode=yes @args }
 
 $deployDir = $PSScriptRoot
 
@@ -56,7 +56,7 @@ foreach ($file in @(".env", "tunnel.env", "docker-compose.yml")) {
 Write-Host "Preparing Oracle deployment directory..."
 
 ssh -i $SshKey "ubuntu@$HostIp" `
-    "sudo mkdir -p /opt/parkour-baar && sudo chown ubuntu:ubuntu /opt/parkour-baar"
+    "sudo mkdir -p /opt/parkour-baar && sudo chown ubuntu:ubuntu /opt/parkour-baar && mkdir -p /opt/parkour-baar/gateway /opt/parkour-baar/maintenance"
 
 Write-Host "Uploading deployment files..."
 
@@ -71,6 +71,20 @@ scp -i $SshKey $appEnv `
 
 scp -i $SshKey (Join-Path $deployDir "tunnel.env") `
     "ubuntu@${HostIp}:/opt/parkour-baar/tunnel.env"
+
+scp -i $SshKey (Join-Path $deployDir "gateway\server.mjs") `
+    "ubuntu@${HostIp}:/opt/parkour-baar/gateway/server.mjs"
+
+# Optional (UptimeRobot key for the maintenance gateway).
+$gatewayEnv = Join-Path $deployDir "gateway.env"
+if (Test-Path $gatewayEnv) {
+    scp -i $SshKey $gatewayEnv `
+        "ubuntu@${HostIp}:/opt/parkour-baar/gateway.env"
+    ssh -i $SshKey "ubuntu@$HostIp" "chmod 600 /opt/parkour-baar/gateway.env"
+}
+else {
+    Write-Host "No deploy/gateway.env: maintenance page works, UptimeRobot monitors will not be paused."
+}
 
 Write-Host "Starting deployment..."
 

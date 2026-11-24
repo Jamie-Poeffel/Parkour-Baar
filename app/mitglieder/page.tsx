@@ -2,24 +2,24 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, CalendarDays, Mail, User } from "lucide-react";
+import { ArrowRight, CalendarDays, CalendarPlus, Mail, User } from "lucide-react";
 import { SignOutBtn } from "@/components/SignOutBtn";
 import { Navigation } from "@/components/Navigation";
 import { hasPermission, getRole } from "@/utils/permissions";
 import { getSiteData } from "@/utils/site-data";
-import { getTrainingSnapshot, anmeldenFuerTraining } from "@/utils/trainings";
+import {
+    getTrainingSnapshot,
+    anmeldenFuerTraining,
+    abmeldenVonTraining,
+} from "@/utils/trainings";
+import { getActiveAbsencesForUser, isAbsentOn } from "@/utils/absences";
 import PostTrainingPrompt from "@/app/abmelden/PostTrainingPrompt";
 import { buildGroups, DAY_INDEX } from "@/utils/session-groups";
+import { localIso, nextTrainingDate } from "@/utils/school-holidays";
 
+/** Next real training day (skips school holidays and free days). */
 function nextOccurrenceDate(dayName: string): Date {
-    const target = DAY_INDEX[dayName] ?? 0;
-    const now = new Date();
-    let diff = target - now.getDay();
-    if (diff < 0) diff += 7;
-    const d = new Date(now);
-    d.setDate(now.getDate() + diff);
-    d.setHours(0, 0, 0, 0);
-    return d;
+    return nextTrainingDate(DAY_INDEX[dayName] ?? 0);
 }
 
 function formatDate(d: Date): string {
@@ -37,12 +37,23 @@ export default async function MitgliederPage() {
     const isAdmin = role === "admin";
     const { training, contact } = await getSiteData();
 
+    const absences = await getActiveAbsencesForUser(userId);
+
     const sessionData = await Promise.all(
         training.sessions.map(async (s) => {
             const snap = await getTrainingSnapshot(s.id, s.day);
             const inParticipants = snap.participants.includes(userId);
             const inAbgemeldet = snap.abgemeldet.includes(userId);
+            const absent = isAbsentOn(
+                absences,
+                localIso(nextOccurrenceDate(s.day)),
+            );
             if (!inParticipants && !inAbgemeldet) {
+                // A longer absence (injury etc.) replaces the auto sign-up.
+                if (absent) {
+                    await abmeldenVonTraining(s.id, userId);
+                    return { sessionId: s.id, angemeldet: false };
+                }
                 await anmeldenFuerTraining(s.id, userId);
             }
             return {
@@ -64,7 +75,8 @@ export default async function MitgliederPage() {
             return d < min ? d : min;
         }, nextOccurrenceDate(g.sessions[0].day));
         const allAngemeldet = g.sessions.every((s) => statusMap[s.id] ?? false);
-        return { ...g, nextDate, allAngemeldet };
+        const absence = isAbsentOn(absences, localIso(nextDate));
+        return { ...g, nextDate, allAngemeldet, absence };
     });
     groupsWithMeta.sort((a, b) => a.nextDate.getTime() - b.nextDate.getTime());
     const nextGroup = groupsWithMeta[0] ?? null;
@@ -160,8 +172,17 @@ export default async function MitgliederPage() {
                             >
                                 {nextGroup.allAngemeldet
                                     ? "Angemeldet"
-                                    : "Abgemeldet"}
+                                    : nextGroup.absence
+                                      ? `Abwesend · ${nextGroup.absence.reason}`
+                                      : "Abgemeldet"}
                             </span>
+                            <a
+                                href="/api/calendar"
+                                download
+                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-neutral-700 border border-neutral-200 rounded-md hover:bg-neutral-50 hover:border-neutral-400 transition-colors"
+                            >
+                                <CalendarPlus className="w-3.5 h-3.5" /> Kalender
+                            </a>
                             <Link
                                 href="/abmelden"
                                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-neutral-700 border border-neutral-200 rounded-md hover:bg-neutral-50 hover:border-neutral-400 transition-colors"

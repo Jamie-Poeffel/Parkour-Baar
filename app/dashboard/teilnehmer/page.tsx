@@ -8,6 +8,7 @@ import {
     resetTraining,
 } from "@/utils/trainings";
 import { getSiteData } from "@/utils/site-data";
+import { getAllActiveAbsences } from "@/utils/absences";
 import { hasPermission, getRole } from "@/utils/permissions";
 import { revalidatePath } from "next/cache";
 import { logAction } from "@/lib/axiom/action";
@@ -45,6 +46,19 @@ export default async function TeilnehmerPage() {
     if (!hasPermission(role, "dashboard:access")) redirect("/dashboard");
 
     const { training } = await getSiteData();
+    const absences = await getAllActiveAbsences();
+    const absentUsers = await resolveUsers([
+        ...new Set(absences.map((a) => a.userId)),
+    ]);
+    const absentName = (id: string) =>
+        absentUsers.find((u) => u.id === id)?.name ?? id;
+    const fmt = (iso: string) =>
+        new Date(`${iso}T12:00:00Z`).toLocaleDateString("de-CH", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+            timeZone: "Europe/Zurich",
+        });
 
     const sessionData = await Promise.all(
         training.sessions.map(async (s) => {
@@ -121,6 +135,34 @@ export default async function TeilnehmerPage() {
                 <h1 className="text-2xl font-black text-neutral-900 tracking-tight">
                     Teilnehmerlisten
                 </h1>
+
+                {absences.length > 0 && (
+                    <div className="bg-white rounded-xl border border-neutral-200 px-6 py-4">
+                        <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-3">
+                            Längere Absenzen ({absences.length})
+                        </p>
+                        <ul className="space-y-2">
+                            {absences.map((a) => (
+                                <li key={a.id} className="text-sm">
+                                    <span className="font-semibold text-neutral-900">
+                                        {absentName(a.userId)}
+                                    </span>{" "}
+                                    <span className="text-neutral-500">
+                                        · {a.reason} · {fmt(a.from)}
+                                        {a.to
+                                            ? ` – ${fmt(a.to)}`
+                                            : " – bis auf Weiteres"}
+                                    </span>
+                                    {a.note && (
+                                        <p className="text-xs text-neutral-400">
+                                            {a.note}
+                                        </p>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
 
                 {sessionData.map(({ session: s, participants, abgemeldet }) => (
                     <div

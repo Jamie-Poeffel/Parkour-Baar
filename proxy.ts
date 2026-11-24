@@ -1,5 +1,4 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import type { NextFetchEvent, NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 
@@ -50,8 +49,16 @@ export default clerkMiddleware(async (auth, req) => {
 
         status = response?.status ?? 200;
     } catch (error) {
-        failure = error;
-        status = 500;
+        // auth.protect() throws a NEXT_REDIRECT (to sign-in) for signed-out
+        // visitors and link-preview bots. That is control flow, not a failure.
+        const digest = (error as { digest?: unknown } | null)?.digest;
+        if (typeof digest === "string" && digest.startsWith("NEXT_REDIRECT")) {
+            status = 307;
+            redirectedTo = "sign-in";
+        } else {
+            failure = error;
+            status = 500;
+        }
         throw error;
     } finally {
         const durationMs = Math.round(performance.now() - startedAt);
@@ -101,6 +108,8 @@ export default clerkMiddleware(async (auth, req) => {
 
     const headers = new Headers(req.headers);
     headers.set("x-request-id", requestId);
+    // Request header too, so server components (e.g. not-found) see the route.
+    headers.set("x-pathname", req.nextUrl.pathname);
 
     return NextResponse.next({
         request: { headers },
@@ -110,7 +119,7 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
     matcher: [
-        "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-        "/(api|trpc)(.*)",
+        "/((?!_next|api/health$|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+        "/(api(?!/health$)|trpc)(.*)",
     ],
 };

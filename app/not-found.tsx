@@ -1,15 +1,9 @@
 import Link from "next/link";
 import { Navigation } from "@/components/Navigation";
-import { headers } from "next/headers";
-import { requestLogger } from "@/lib/axiom/request-logger";
 
-export default async function NotFound() {
-  const requestHeaders = await headers();
-
-  await requestLogger.warn("request.not_found", {
-    pathname: requestHeaders.get("x-pathname") ?? "unknown",
-  });
-
+// Do not log here: Next renders this on normal requests too. Real 404s are
+// logged in app/[...slug]/page.tsx.
+export default function NotFound() {
   return (
     <>
       <Navigation />

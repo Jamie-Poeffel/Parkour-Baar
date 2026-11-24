@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
-import { reportClientError } from "@/lib/axiom/report-client-error";
 
 export default function Error({
   error,

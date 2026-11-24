@@ -29,7 +29,7 @@ export default function LoginPage() {
                   </Link>
                   <div>
                       <blockquote className="text-white/80 text-xl leading-relaxed font-medium">
-                          "Be strong to be useful."
+                          &ldquo;Be strong to be useful.&rdquo;
                       </blockquote>
                       <cite className="mt-3 block text-sm text-white/40 not-italic">
                           — Georges Hébert

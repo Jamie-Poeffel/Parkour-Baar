@@ -62,10 +62,9 @@ export default function DatenschutzPage() {
               3. Hosting und Bereitstellung
             </h2>
             <p>
-              Unsere Website wird auf Amazon Web Services (AWS) mit Amazon ECS
-              und AWS Fargate betrieben. Cloudflare wird als vorgelagerter
-              Dienst für die Bereitstellung und Absicherung der Website
-              eingesetzt.
+              Unsere Website wird auf der Oracle Cloud Infrastructure (OCI)
+              betrieben. Cloudflare wird als vorgelagerter Dienst für die
+              Bereitstellung und Absicherung der Website eingesetzt.
             </p>
             <p className="mt-3">
               Im Rahmen dieser Dienste können technische Verbindungsdaten,
@@ -74,12 +73,12 @@ export default function DatenschutzPage() {
               Dienstleister verarbeitet werden. Weitere Informationen findest du
               in den{" "}
               <a
-                href="https://aws.amazon.com/privacy/"
+                href="https://www.oracle.com/legal/privacy/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline underline-offset-2 hover:text-neutral-900 transition-colors"
               >
-                Datenschutzinformationen von AWS
+                Datenschutzinformationen von Oracle
               </a>{" "}
               und der{" "}
               <a
